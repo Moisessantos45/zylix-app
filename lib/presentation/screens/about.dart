@@ -20,6 +20,7 @@ class _AboutScreenState extends State<AboutScreen> {
   String API_URL = dotenv.env['API_URL'] ?? '';
   bool downloading = false;
   String versionCode = "1.0.0";
+  DateTime currentDate = DateTime.now();
 
   void snackbar(String message, {Color? backgroundColor}) {
     if (mounted) {
@@ -238,13 +239,12 @@ class _AboutScreenState extends State<AboutScreen> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              "Gestiona tus proyectos y tareas de forma eficiente",
+                              "La aplicación Zylix es una herramienta innovadora diseñada para optimizar y simplificar la gestión de documentos PDF. Con una interfaz intuitiva y funcionalidades avanzadas, Zylix permite a los usuarios dividir, fusionar, comprimir y convertir archivos PDF de manera eficiente. Ya sea para uso personal o profesional, Zylix ofrece una solución completa para todas las necesidades relacionadas con documentos PDF.",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: Colors.black.withAlpha(180),
-                                fontSize: 16,
+                                color: Colors.grey.shade600,
+                                fontSize: 14,
                                 height: 1.5,
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -394,10 +394,10 @@ class _AboutScreenState extends State<AboutScreen> {
 
                             const SizedBox(height: 32),
                             Text(
-                              "© 2025 Zylix. Todos los derechos reservados.",
+                              "© ${currentDate.year} Zylix. Todos los derechos reservados.",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: Colors.white.withAlpha(128),
+                                 color: Colors.grey.shade600,
                                 fontSize: 12,
                               ),
                             ),
