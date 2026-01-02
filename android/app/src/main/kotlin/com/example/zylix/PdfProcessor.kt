@@ -123,14 +123,8 @@ object PdfProcessor {
                         } else {
                             File(pdfPath).nameWithoutExtension
                         }
-                val pdfSubfolderPath =
-                        FileUtils.createSubfolder(context, outputDirPath, pdfName)
-                                ?: run {
-                                    Log.e(TAG, "Could not create subfolder for: $pdfName")
-                                    return@forEach
-                                }
 
-                Log.d(TAG, "Processing PDF: $pdfName, subfolder path: $pdfSubfolderPath")
+                Log.d(TAG, "Processing PDF: $pdfName")
 
                 pdfRenderer = PdfRenderer(fileDescriptor)
 
@@ -152,14 +146,69 @@ object PdfProcessor {
 
                         val fileName = "${pdfName}_page_${pageIndex + 1}.png"
 
+                        // Crear archivo dentro de la subcarpeta
                         val (outputStream, outputPath) =
-                                FileUtils.createOutputFile(
-                                        context,
-                                        pdfSubfolderPath,
-                                        fileName,
-                                        "image/png"
-                                )
-                                        ?: return@repeat
+                                if (outputDirPath.startsWith("content://")) {
+                                    // Para content:// URIs, crear la subcarpeta y archivo directamente
+                                    val subfolderDocFile =
+                                            FileUtils.createSubfolderDocumentFile(
+                                                    context,
+                                                    outputDirPath,
+                                                    pdfName
+                                            )
+                                                    ?: run {
+                                                        Log.e(
+                                                                TAG,
+                                                                "Could not create subfolder for: $pdfName"
+                                                        )
+                                                        return@repeat
+                                                    }
+
+                                    val newFile =
+                                            subfolderDocFile.createFile("image/png", fileName)
+                                                    ?: run {
+                                                        Log.e(
+                                                                TAG,
+                                                                "Could not create file: $fileName"
+                                                        )
+                                                        return@repeat
+                                                    }
+
+                                    val outputStream =
+                                            context.contentResolver.openOutputStream(newFile.uri)
+                                                    ?: run {
+                                                        Log.e(
+                                                                TAG,
+                                                                "Could not open output stream for: $fileName"
+                                                        )
+                                                        return@repeat
+                                                    }
+
+                                    Pair(outputStream, newFile.uri.toString())
+                                } else {
+                                    // Para rutas de archivo normales
+                                    val pdfSubfolderPath =
+                                            FileUtils.createSubfolder(
+                                                    context,
+                                                    outputDirPath,
+                                                    pdfName
+                                            )
+                                                    ?: run {
+                                                        Log.e(
+                                                                TAG,
+                                                                "Could not create subfolder for: $pdfName"
+                                                        )
+                                                        return@repeat
+                                                    }
+
+                                    FileUtils.createOutputFile(
+                                            context,
+                                            pdfSubfolderPath,
+                                            fileName,
+                                            "image/png"
+                                    )
+                                            ?: return@repeat
+                                }
 
                         Log.d(TAG, "Saving image: $fileName to path: $outputPath")
 

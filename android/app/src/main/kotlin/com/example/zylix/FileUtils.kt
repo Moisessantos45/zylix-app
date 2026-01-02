@@ -31,12 +31,15 @@ object FileUtils {
 
                 val docFile =
                         if (uri.toString().contains("/tree/")) {
+                            // Es una tree URI, usarla directamente
                             androidx.documentfile.provider.DocumentFile.fromTreeUri(context, uri)
                         } else {
+                            // Es una document URI (como las subcarpetas), usar fromSingleUri
                             androidx.documentfile.provider.DocumentFile.fromSingleUri(context, uri)
                         }
 
                 if (docFile == null || !docFile.isDirectory) {
+                    Log.e(TAG, "Not a directory or cannot access: $dirPath, docFile=$docFile, isDirectory=${docFile?.isDirectory}")
                     throw IllegalArgumentException("Cannot access directory URI: $dirPath")
                 }
 
@@ -65,6 +68,50 @@ object FileUtils {
     }
 
     /**
+     * Crea una subcarpeta dentro de un directorio padre y retorna el DocumentFile.
+     * @param context Contexto de la aplicación
+     * @param parentDirPath Ruta del directorio padre
+     * @param folderName Nombre de la subcarpeta a crear
+     * @return DocumentFile de la subcarpeta creada o null si hay error
+     */
+    fun createSubfolderDocumentFile(
+            context: Context,
+            parentDirPath: String,
+            folderName: String
+    ): androidx.documentfile.provider.DocumentFile? {
+        return try {
+            if (!parentDirPath.startsWith("content://")) {
+                Log.e(TAG, "parentDirPath must be a content:// URI")
+                return null
+            }
+
+            val parentUri = Uri.parse(parentDirPath)
+            val parentDocFile =
+                    androidx.documentfile.provider.DocumentFile.fromTreeUri(context, parentUri)
+                            ?: throw IllegalArgumentException(
+                                    "Cannot access parent directory URI: $parentDirPath"
+                            )
+
+            val existingFolder = parentDocFile.findFile(folderName)
+            val subfolder =
+                    if (existingFolder != null && existingFolder.isDirectory) {
+                        existingFolder
+                    } else {
+                        parentDocFile.createDirectory(folderName)
+                                ?: throw IllegalArgumentException(
+                                        "Cannot create subfolder: $folderName"
+                                )
+                    }
+
+            Log.d(TAG, "Created subfolder DocumentFile: ${subfolder.uri} for folder: $folderName")
+            subfolder
+        } catch (e: Exception) {
+            Log.e(TAG, "Error creating subfolder: $folderName in $parentDirPath", e)
+            null
+        }
+    }
+
+    /**
      * Crea una subcarpeta dentro de un directorio padre.
      * @param context Contexto de la aplicación
      * @param parentDirPath Ruta del directorio padre
@@ -74,27 +121,8 @@ object FileUtils {
     fun createSubfolder(context: Context, parentDirPath: String, folderName: String): String? {
         return try {
             if (parentDirPath.startsWith("content://")) {
-                val parentUri = Uri.parse(parentDirPath)
-                val parentDocFile =
-                        androidx.documentfile.provider.DocumentFile.fromTreeUri(context, parentUri)
-                                ?: throw IllegalArgumentException(
-                                        "Cannot access parent directory URI: $parentDirPath"
-                                )
-
-                val existingFolder = parentDocFile.findFile(folderName)
-                val subfolder =
-                        if (existingFolder != null && existingFolder.isDirectory) {
-                            existingFolder
-                        } else {
-                            parentDocFile.createDirectory(folderName)
-                                    ?: throw IllegalArgumentException(
-                                            "Cannot create subfolder: $folderName"
-                                    )
-                        }
-
-                val subfolderUri = subfolder.uri.toString()
-                Log.d(TAG, "Created subfolder URI: $subfolderUri for folder: $folderName")
-                subfolderUri
+                val subfolder = createSubfolderDocumentFile(context, parentDirPath, folderName)
+                subfolder?.uri?.toString()
             } else {
                 val parentDir = File(parentDirPath)
                 val subfolder = File(parentDir, folderName)
