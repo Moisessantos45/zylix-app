@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:zylix/presentation/screens/about.dart';
 import 'package:zylix/presentation/screens/screens.dart';
 import 'package:zylix/presentation/shared/color.dart';
 import 'package:zylix/presentation/widgets/tool.dart';
@@ -121,6 +120,21 @@ class _HomeScreenState extends State<HomeScreen> {
                               },
                             ),
                             ToolCard(
+                              icon: Icons.splitscreen,
+                              title: "Split PDFs",
+                              description:
+                                  "Divide your PDFs into individual pages or custom ranges",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SplitPdfScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                            ToolCard(
                               icon: Icons.compress,
                               title: "Compress PDFs",
                               description:
@@ -189,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const ImageToFormantScreen(),
+                                        const ImageToFormatConverterScreen(),
                                   ),
                                 );
                               },
