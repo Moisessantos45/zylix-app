@@ -190,6 +190,27 @@ class NativeBridge {
     }
   }
 
+  static Future<void> splitPdf(
+    List<String> pdfPaths,
+    String outputDirPath,
+    int? startPage,
+    int? endPage,
+    int? splitAt,
+  ) async {
+    try {
+      await _channel.invokeMethod('splitPdfs', {
+        'pdfPaths': pdfPaths,
+        'outputDirPath': outputDirPath,
+        'startPage': startPage,
+        'endPage': endPage,
+        'splitAt': splitAt,
+      });
+    } catch (e) {
+      debugPrint('Error in splitPdf: $e');
+      throw Exception('Error splitting PDF: $e');
+    }
+  }
+
   static Future<void> optimizePdf(
     List<String> pdfPath,
     int quantity,
