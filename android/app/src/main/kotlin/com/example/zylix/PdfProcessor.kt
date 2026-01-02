@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import com.tom_roush.pdfbox.multipdf.PDFMergerUtility
+import com.tom_roush.pdfbox.multipdf.Splitter
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import java.io.File
 
@@ -149,7 +150,8 @@ object PdfProcessor {
                         // Crear archivo dentro de la subcarpeta
                         val (outputStream, outputPath) =
                                 if (outputDirPath.startsWith("content://")) {
-                                    // Para content:// URIs, crear la subcarpeta y archivo directamente
+                                    // Para content:// URIs, crear la subcarpeta y archivo
+                                    // directamente
                                     val subfolderDocFile =
                                             FileUtils.createSubfolderDocumentFile(
                                                     context,
@@ -379,6 +381,147 @@ object PdfProcessor {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error optimizing PDF: $inputPath", e)
+            } finally {
+                inputStream?.close()
+            }
+        }
+    }
+
+    /**
+     * Separa PDFs en páginas individuales.
+     * @param context Contexto de la aplicación
+     * @param pdfPaths Lista de rutas de PDFs a separar
+     * @param outputDirPath Directorio de salida
+     * @param startPage Página inicial (por defecto 1)
+     * @param endPage Página final (por defecto -1 para todas las páginas)
+     * @param splitAt Cada cuántas páginas dividir (por defecto 1 = una por archivo)
+     */
+    fun splitPdfs(
+            context: Context,
+            pdfPaths: List<String>,
+            outputDirPath: String,
+            startPage: Int = 1,
+            endPage: Int = -1,
+            splitAt: Int = 1
+    ) {
+        pdfPaths.forEach { inputPath ->
+            var inputStream: java.io.InputStream? = null
+
+            try {
+                val pdfName =
+                        if (inputPath.startsWith("content://")) {
+                            UriHelper.getFileNameFromUri(context, Uri.parse(inputPath))
+                                    .substringBeforeLast('.')
+                        } else {
+                            File(inputPath).nameWithoutExtension
+                        }
+
+                Log.d(TAG, "Splitting PDF: $pdfName")
+
+                inputStream =
+                        if (inputPath.startsWith("content://")) {
+                            context.contentResolver.openInputStream(Uri.parse(inputPath))
+                        } else {
+                            File(inputPath).inputStream()
+                        }
+
+                inputStream?.use { input ->
+                    PDDocument.load(input).use { document ->
+                        val splitter = Splitter()
+                        splitter.setStartPage(startPage)
+                        splitter.setEndPage(if (endPage == -1) document.numberOfPages else endPage)
+                        splitter.setSplitAtPage(splitAt)
+
+                        val splitDocs = splitter.split(document)
+
+                        splitDocs.forEachIndexed { index, pdDoc ->
+                            try {
+                                val pageNumber = startPage + (index * splitAt)
+                                val fileName = "page_$pageNumber.pdf"
+
+                                // Crear archivo dentro de la subcarpeta
+                                val (outputStream, outputPath) =
+                                        if (outputDirPath.startsWith("content://")) {
+                                            // Para content:// URIs, crear la subcarpeta y archivo
+                                            // directamente
+                                            val subfolderDocFile =
+                                                    FileUtils.createSubfolderDocumentFile(
+                                                            context,
+                                                            outputDirPath,
+                                                            pdfName
+                                                    )
+                                                            ?: run {
+                                                                Log.e(
+                                                                        TAG,
+                                                                        "Could not create subfolder for: $pdfName"
+                                                                )
+                                                                return@forEachIndexed
+                                                            }
+
+                                            val newFile =
+                                                    subfolderDocFile.createFile(
+                                                            "application/pdf",
+                                                            fileName
+                                                    )
+                                                            ?: run {
+                                                                Log.e(
+                                                                        TAG,
+                                                                        "Could not create file: $fileName"
+                                                                )
+                                                                return@forEachIndexed
+                                                            }
+
+                                            val outputStream =
+                                                    context.contentResolver.openOutputStream(
+                                                            newFile.uri
+                                                    )
+                                                            ?: run {
+                                                                Log.e(
+                                                                        TAG,
+                                                                        "Could not open output stream for: $fileName"
+                                                                )
+                                                                return@forEachIndexed
+                                                            }
+
+                                            Pair(outputStream, newFile.uri.toString())
+                                        } else {
+                                            // Para rutas de archivo normales
+                                            val pdfSubfolderPath =
+                                                    FileUtils.createSubfolder(
+                                                            context,
+                                                            outputDirPath,
+                                                            pdfName
+                                                    )
+                                                            ?: run {
+                                                                Log.e(
+                                                                        TAG,
+                                                                        "Could not create subfolder for: $pdfName"
+                                                                )
+                                                                return@forEachIndexed
+                                                            }
+
+                                            FileUtils.createOutputFile(
+                                                    context,
+                                                    pdfSubfolderPath,
+                                                    fileName,
+                                                    "application/pdf"
+                                            )
+                                                    ?: return@forEachIndexed
+                                        }
+
+                                Log.d(TAG, "Saving page: $fileName to path: $outputPath")
+
+                                outputStream.use { out -> pdDoc.save(out) }
+
+                                Log.d(TAG, "Successfully saved: $fileName")
+                            } finally {
+                                pdDoc.close()
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error splitting PDF: $inputPath", e)
             } finally {
                 inputStream?.close()
             }

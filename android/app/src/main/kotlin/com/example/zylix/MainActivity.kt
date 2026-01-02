@@ -331,6 +331,35 @@ class MainActivity : FlutterActivity() {
                         )
                     }
                 }
+                "splitPdfs" -> {
+                    val pdfPaths = call.argument<List<String>>("pdfPaths")
+                    val outputDirPath = call.argument<String>("outputDirPath")
+                    val startPage = call.argument<Int>("startPage") ?: 1
+                    val endPage = call.argument<Int>("endPage") ?: -1
+                    val splitAt = call.argument<Int>("splitAt") ?: 1
+                    if (pdfPaths != null && outputDirPath != null) {
+                        try {
+                            PdfProcessor.splitPdfs(
+                                    this,
+                                    pdfPaths,
+                                    outputDirPath,
+                                    startPage,
+                                    endPage,
+                                    splitAt
+                            )
+                            result.success(null)
+                        } catch (e: Exception) {
+                            Log.e("PDF", "Error in splitPdfs", e)
+                            result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                        }
+                    } else {
+                        result.error(
+                                "INVALID_ARGUMENT",
+                                "PDF paths or output dir path is null",
+                                null
+                        )
+                    }
+                }
                 else -> result.notImplemented()
             }
         }
