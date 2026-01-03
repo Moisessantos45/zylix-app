@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zylix/presentation/screens/screens.dart';
 import 'package:zylix/presentation/shared/color.dart';
-import 'package:zylix/presentation/widgets/tool.dart';
+import 'package:zylix/presentation/widgets/tool_grid_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
         surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(
+        title: const Text(
           "Zylix",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
         ),
@@ -64,19 +64,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 500),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              double horizontalPadding = constraints.maxWidth * 0.05;
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            double horizontalPadding = constraints.maxWidth * 0.05;
+            int crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
 
-              return Padding(
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    Text(
+                    const Text(
                       "All Your Productivity Tools in One Place",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -87,138 +88,195 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 16),
                     Text(
                       "Easily convert, merge, and optimize your files with our suite of powerful tools.",
-                      style: TextStyle(color: Colors.grey.shade600),
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 15,
+                      ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      "Explore Our Tools",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
+                    const SizedBox(height: 32),
+                    _buildSectionHeader(
+                      icon: Icons.picture_as_pdf,
+                      title: "PDF Tools",
+                      color: AppColor.primaryColor,
                     ),
                     const SizedBox(height: 16),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        physics: BouncingScrollPhysics(),
-                        child: Column(
-                          children: [
-                            ToolCard(
-                              icon: Icons.picture_as_pdf,
-                              title: "Marge PDFs",
-                              description:
-                                  "Combine multiple files into one seamless document",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const MergePdfScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            ToolCard(
-                              icon: Icons.splitscreen,
-                              title: "Split PDFs",
-                              description:
-                                  "Divide your PDFs into individual pages or custom ranges",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const SplitPdfScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            ToolCard(
-                              icon: Icons.compress,
-                              title: "Compress PDFs",
-                              description:
-                                  "Reduce file size significantly without losing quality",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const OptimizePdfScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            ToolCard(
-                              icon: Icons.transform,
-                              title: "Convert PDF To Image",
-                              description: "Convert pdf to image",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const PdfToImageScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            ToolCard(
-                              icon: Icons.broken_image,
-                              title: "Images To PDF",
-                              description:
-                                  "Convert multiple images into one seamless document",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ImageToPdfScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            ToolCard(
-                              icon: Icons.image_outlined,
-                              title: "Compress Image",
-                              description:
-                                  "Reduce file size significantly without losing quality",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const OptimizeImageScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            ToolCard(
-                              icon: Icons.imagesearch_roller,
-                              title: "Image Convert",
-                              description:
-                                  "Switch between JPG,PNG and WebP formats",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ImageToFormatConverterScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
+                    GridView.count(
+                      crossAxisCount: crossAxisCount,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 0.85,
+                      children: [
+                        ToolGridCard(
+                          icon: Icons.merge_type,
+                          title: "Merge PDFs",
+                          description:
+                              "Combine multiple files into one seamless document",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MergePdfScreen(),
+                              ),
+                            );
+                          },
                         ),
-                      ),
+                        ToolGridCard(
+                          icon: Icons.splitscreen,
+                          title: "Split PDFs",
+                          description:
+                              "Divide your PDFs into individual pages or custom ranges",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SplitPdfScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        ToolGridCard(
+                          icon: Icons.compress,
+                          title: "Compress PDFs",
+                          description:
+                              "Reduce file size significantly without losing quality",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const OptimizePdfScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        ToolGridCard(
+                          icon: Icons.transform,
+                          title: "PDF To Image",
+                          description:
+                              "Transform your PDF pages into high-quality images",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PdfToImageScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
+
+                    const SizedBox(height: 32),
+                    _buildSectionHeader(
+                      icon: Icons.image,
+                      title: "Image Tools",
+                      color: AppColor.primaryColor,
+                    ),
+                    const SizedBox(height: 16),
+                    GridView.count(
+                      crossAxisCount: crossAxisCount,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 0.85,
+                      children: [
+                        ToolGridCard(
+                          icon: Icons.photo_library,
+                          title: "Images To PDF",
+                          description:
+                              "Convert multiple images into one seamless document",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ImageToPdfScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        ToolGridCard(
+                          icon: Icons.compress,
+                          title: "Compress Image",
+                          description:
+                              "Reduce file size significantly without losing quality",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const OptimizeImageScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        ToolGridCard(
+                          icon: Icons.transform_outlined,
+                          title: "Image Convert",
+                          description:
+                              "Switch between JPG, PNG and WebP formats",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ImageToFormatConverterScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 32),
                   ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [color, color.withAlpha(30)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: color.withAlpha(75),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(icon, color: Colors.white, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            color: Colors.black87,
+          ),
+        ),
+      ],
     );
   }
 }
