@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zylix/config/api.dart';
 import 'package:zylix/presentation/screens/screens.dart';
 import 'package:zylix/presentation/shared/color.dart';
 import 'package:zylix/presentation/widgets/tool_grid_card.dart';
@@ -11,6 +12,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => Api.initializeVersion());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

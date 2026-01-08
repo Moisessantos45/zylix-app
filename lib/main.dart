@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:zylix/presentation/screens/welcome.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final GlobalKey<ScaffoldMessengerState> messageKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -9,7 +8,7 @@ final GlobalKey<ScaffoldMessengerState> messageKey =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Future.wait([
-    dotenv.load(fileName: '.env'),
+    // dotenv.load(fileName: '.env'),
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,

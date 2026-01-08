@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:zylix/config/config.dart';
 import 'package:zylix/config/service/native_bridge.dart';
+import 'package:zylix/config/utils/snackbar_helper.dart';
 import 'package:zylix/presentation/shared/color.dart';
 import 'package:zylix/presentation/widgets/info_section.dart';
 
@@ -17,23 +18,17 @@ class AboutScreen extends StatefulWidget {
 class _AboutScreenState extends State<AboutScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  String API_URL = dotenv.env['API_URL'] ?? '';
   bool downloading = false;
   String versionCode = "1.0.0";
   DateTime currentDate = DateTime.now();
 
-  void snackbar(String message, {Color? backgroundColor}) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: backgroundColor ?? AppColor.primaryColor,
-        ),
-      );
-    }
-  }
-
   Future<void> _initializeVersion() async {
+    debugPrint("Obteniendo versión de la aplicación... ${Config.API_URL}");
+    if (Config.API_URL.isEmpty) {
+      debugPrint("ERROR: API_URL vacío, abortando...");
+      return;
+    }
+
     final version = await NativeBridge.getAppVersion();
     debugPrint("Version: $version");
     if (version == null) return;
@@ -47,7 +42,7 @@ class _AboutScreenState extends State<AboutScreen> {
     try {
       final dio = Dio();
       final response = await dio.post(
-        API_URL,
+        Config.API_URL,
         queryParameters: {'app': 'zylix-$versionCode'},
         options: Options(responseType: ResponseType.bytes),
       );
@@ -98,7 +93,7 @@ class _AboutScreenState extends State<AboutScreen> {
       final dio = Dio();
 
       final response = await dio.get(
-        '${dotenv.env['API_URL']}/version-check',
+        '${Config.API_URL}/version-check',
         queryParameters: {'app': 'zylix-$versionCode'},
       );
 
@@ -107,26 +102,25 @@ class _AboutScreenState extends State<AboutScreen> {
         debugPrint("Version: $data");
         if (data['data'] != null && data['data']['codeVersion'] != null) {
           if (data['data']['codeVersion'] != versionCode) {
-            snackbar(
-              "Nueva versión disponible. Descargando...",
-              backgroundColor: Colors.blue,
-            );
+            showGlobalSnackBar("Nueva versión disponible. Descargando...");
             await downloadAPK();
           }
         } else {
-          snackbar(
-            "Ya tienes la última versión",
-            backgroundColor: Colors.green,
-          );
+          showGlobalSnackBar("Ya tienes la última versión");
         }
       }
       debugPrint('Versión verificada correctamente');
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 500) {
+        debugPrint(
+          'Servidor API caído (${e.response?.statusCode}), usando versión local',
+        );
+      } else {
+        rethrow;
+      }
     } catch (e) {
       debugPrint('Error al verificar la versión: $e');
-      snackbar(
-        "Error al verificar actualizaciones",
-        backgroundColor: Colors.red,
-      );
+      showGlobalSnackBar("Error al verificar actualizaciones", isError: true);
     } finally {
       if (mounted) {
         setState(() {
@@ -397,7 +391,7 @@ class _AboutScreenState extends State<AboutScreen> {
                               "© ${currentDate.year} Zylix. Todos los derechos reservados.",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                 color: Colors.grey.shade600,
+                                color: Colors.grey.shade600,
                                 fontSize: 12,
                               ),
                             ),
