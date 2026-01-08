@@ -23,7 +23,7 @@ class CustomElevatedButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.0),
           ),
         ),
-        child: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+        child: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
       ),
     );
   }

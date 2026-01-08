@@ -46,8 +46,8 @@ class _ToolGridCardState extends State<ToolGridCard> {
           boxShadow: [
             BoxShadow(
               color: AppColor.primaryColor.withAlpha(_isPressed ? 150 : 75),
-              blurRadius: _isPressed ? 8 : 12,
-              offset: Offset(0, _isPressed ? 2 : 4),
+              blurRadius: _isPressed ? 1 : 2,
+              offset: Offset(0, _isPressed ? 1 : 1),
             ),
           ],
         ),

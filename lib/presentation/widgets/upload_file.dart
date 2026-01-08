@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:zylix/presentation/shared/color.dart';
+import 'package:zylix/presentation/widgets/custom_outlined_button.dart';
 
 class UploadFile extends StatelessWidget {
   final String subtitle;
   final VoidCallback onPressed;
-  const UploadFile({super.key, required this.subtitle,required this.onPressed});
+  const UploadFile({
+    super.key,
+    required this.subtitle,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(width: 2, color: Colors.grey.shade300),
+        border: Border.all(width: 2, color: AppColor.primaryColor.withAlpha(50)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -36,18 +42,12 @@ class UploadFile extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColor.primaryColor,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-            ),
-            child: Text(
-              "Select Files",
-              style: TextStyle(fontWeight: FontWeight.bold),
+          SizedBox(
+            width: width * 0.5,
+            child: CustomOutlinedButton(
+              getDirectoryPath: onPressed,
+              title: "Select Files",
+              icon: Icons.upload_file,
             ),
           ),
         ],
