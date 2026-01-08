@@ -127,6 +127,22 @@ class NativeBridge {
     }
   }
 
+  static Future<void> showNotification(
+    String title,
+    String message,
+    String channelId,
+  ) async {
+    try {
+      await _channel.invokeMethod('showNotification', {
+        'title': title,
+        'message': message,
+        'channelId': channelId,
+      });
+    } catch (e) {
+      debugPrint("Error showing notification: $e");
+    }
+  }
+
   static Future<List<String>> getFileNamesBatch(List<String> listPaths) async {
     try {
       final List<dynamic> response = await _channel.invokeMethod(
