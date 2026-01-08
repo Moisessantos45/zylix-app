@@ -139,5 +139,9 @@ mixin GridScrollMixin<T extends StatefulWidget> on State<T> {
   void dispose() {
     super.dispose();
     scrollController.dispose();
+    selectedFilesPaths.clear();
+    thumbnails.clear();
+    directoryPath = '';
+    loadedCount = 0;
   }
 }
