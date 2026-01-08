@@ -95,11 +95,18 @@ class _OptimizeImageScreenState extends State<OptimizeImageScreen>
                           onPressed: selectFiles,
                         ),
                       const SizedBox(height: 16),
-                      FileListHeader(
-                        title: "Images",
-                        amount: selectedFilesPaths.length,
-                        onPressed: () {},
-                      ),
+                      if (selectedFilesPaths.isNotEmpty)
+                        FileListHeader(
+                          title: "Images",
+                          amount: selectedFilesPaths.length,
+                          onPressed: () {
+                            setState(() {
+                              selectedFilesPaths.clear();
+                              thumbnails.clear();
+                              loadedCount = 0;
+                            });
+                          },
+                        ),
                       const SizedBox(height: 16),
                       Expanded(
                         child: selectedFilesPaths.isEmpty

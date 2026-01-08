@@ -64,6 +64,12 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen>
   }
 
   @override
+  void dispose() {
+    pdfNameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
       isLoading: isProcessing,
@@ -106,19 +112,18 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen>
                           ),
                         ),
                       const SizedBox(height: 16),
-                      FileListHeader(
-                        title: "Images",
-                        amount: selectedFilesPaths.length,
-                        onPressed: selectedFilesPaths.isNotEmpty
-                            ? () {
-                                setState(() {
-                                  selectedFilesPaths.clear();
-                                  thumbnails.clear();
-                                  loadedCount = 0;
-                                });
-                              }
-                            : () {},
-                      ),
+                      if (selectedFilesPaths.isNotEmpty)
+                        FileListHeader(
+                          title: "Images",
+                          amount: selectedFilesPaths.length,
+                          onPressed: () {
+                            setState(() {
+                              selectedFilesPaths.clear();
+                              thumbnails.clear();
+                              loadedCount = 0;
+                            });
+                          },
+                        ),
                       const SizedBox(height: 16),
                       Expanded(
                         child: selectedFilesPaths.isEmpty

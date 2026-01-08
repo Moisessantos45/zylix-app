@@ -81,6 +81,13 @@ class _MergePdfScreenState extends State<MergePdfScreen> {
   }
 
   @override
+  void dispose() {
+    pdfNameController.dispose();
+    selectedFilesPaths.clear();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
       isLoading: isProcessing,
@@ -128,20 +135,34 @@ class _MergePdfScreenState extends State<MergePdfScreen> {
                           ),
                         ),
                       const SizedBox(height: 16),
-                      FileListHeader(
-                        title: "PDFs",
-                        amount: selectedFilesPaths.length,
-                        onPressed: () {
-                          setState(() {
-                            selectedFilesPaths.clear();
-                            thumbnails.clear();
-                          });
-                        },
-                      ),
+                      if (selectedFilesPaths.isNotEmpty)
+                        FileListHeader(
+                          title: "PDFs",
+                          amount: selectedFilesPaths.length,
+                          onPressed: () {
+                            setState(() {
+                              selectedFilesPaths.clear();
+                              thumbnails.clear();                             
+                            });
+                          },
+                        ),
                       const SizedBox(height: 16),
                       Expanded(
                         child: selectedFilesPaths.isEmpty
-                            ? Text("Not Found PDFs")
+                            ? const Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.picture_as_pdf_outlined,
+                                      size: 64,
+                                      color: Colors.grey,
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text("Not Found PDFs"),
+                                  ],
+                                ),
+                              )
                             : ListView.builder(
                                 itemCount: selectedFilesPaths.length,
                                 physics: BouncingScrollPhysics(),
