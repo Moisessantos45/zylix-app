@@ -114,6 +114,27 @@ class MainActivity : FlutterActivity() {
                         result.error("INVALID_ARGUMENT", "Key is null or empty", null)
                     }
                 }
+                "showNotification" -> {
+                    try {
+                        val title = call.argument<String>("title") ?: "Zylix"
+                        val message = call.argument<String>("message") ?: ""
+                        val channelId = call.argument<String>("channelId") ?: "default_channel_id"
+                        val success =
+                                NotificationHelper.showNotification(this, title, message, channelId)
+                        if (success) {
+                            result.success(null)
+                        } else {
+                            result.error(
+                                    "NOTIFICATION_ERROR",
+                                    "No se pudo mostrar la notificación (posible falta de permiso)",
+                                    null
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error showing notification", e)
+                        result.error("NOTIFICATION_ERROR", e.message ?: "Unknown error", null)
+                    }
+                }
                 "pickMultipleImages" -> {
                     pendingResult = result
                     pendingRequestCode = PICK_IMAGES
