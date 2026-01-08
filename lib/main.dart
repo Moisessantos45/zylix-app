@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:zylix/config/api.dart';
 import 'package:zylix/presentation/screens/welcome.dart';
 
 final GlobalKey<ScaffoldMessengerState> messageKey =
@@ -14,6 +15,8 @@ void main() async {
       DeviceOrientation.portraitDown,
     ]),
   ]);
+
+  Api.initializeVersion();
 
   runApp(const MyApp());
 }
