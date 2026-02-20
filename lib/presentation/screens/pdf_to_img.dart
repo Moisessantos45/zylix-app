@@ -11,10 +11,10 @@ class PdfToImageScreen extends StatefulWidget {
 }
 
 class _PdfToImageScreenState extends State<PdfToImageScreen> {
-  List<String> selectedFilesPaths = [];
-  List<String> thumbnails = [];
-  String directoryPath = "";
-  bool isProcessing = false;
+  ValueNotifier<List<String>> selectedFilesPaths = ValueNotifier([]);
+  ValueNotifier<List<String>> thumbnails = ValueNotifier([]);
+  ValueNotifier<String> directoryPath = ValueNotifier("");
+  ValueNotifier<bool> isProcessing = ValueNotifier<bool>(false);
 
   Future<void> selectFiles() async {
     final files = await NativeBridge.pickMultiplePDFs();
@@ -22,189 +22,211 @@ class _PdfToImageScreenState extends State<PdfToImageScreen> {
 
     if (files.isEmpty) return;
     final filesNames = await NativeBridge.getFileNamesBatch(files);
-
-    setState(() {
-      selectedFilesPaths.addAll(files);
-      thumbnails.addAll(filesNames);
-    });
+    selectedFilesPaths.value.addAll(files);
+    thumbnails.value.addAll(filesNames);
   }
 
   void removeFiles(int index) {
-    if (index < 0 || index >= selectedFilesPaths.length) return;
+    if (index < 0 || index >= selectedFilesPaths.value.length) return;
 
-    setState(() {
-      selectedFilesPaths.removeAt(index);
-      thumbnails.removeAt(index);
-    });
+    selectedFilesPaths.value.removeAt(index);
+    thumbnails.value.removeAt(index);
   }
 
   Future<void> getDirectoryPath() async {
     final directory = await NativeBridge.pickFolder();
     if (directory == null) return;
     debugPrint('Directorio seleccionado: $directory');
-    setState(() {
-      directoryPath = directory;
-    });
+
+    directoryPath.value = directory;
   }
 
   Future<void> processFiles() async {
-    setState(() {
-      isProcessing = true;
-    });
+    if (selectedFilesPaths.value.isEmpty) {
+      showGlobalSnackBar("No hay archivos seleccionados.", isError: true);
+      return;
+    }
+
+    if (directoryPath.value.isEmpty) {
+      showGlobalSnackBar(
+        "No hay directorio de destino seleccionado.",
+        isError: true,
+      );
+      return;
+    }
+
+    isProcessing.value = true;
 
     try {
-      await NativeBridge.pdfToImg(selectedFilesPaths, directoryPath);
+      await NativeBridge.pdfToImg(
+        selectedFilesPaths.value,
+        directoryPath.value,
+      );
 
       if (mounted) {
         showGlobalSnackBar("¡Conversión exitosa!");
-        setState(() {
-          selectedFilesPaths.clear();
-          thumbnails.clear();
-          directoryPath = "";
-        });
+        selectedFilesPaths.value.clear();
+        thumbnails.value.clear();
+        directoryPath.value = "";
       }
     } catch (e) {
       showGlobalSnackBar("Error: $e", isError: true);
     } finally {
       if (mounted) {
-        setState(() {
-          isProcessing = false;
-        });
+        isProcessing.value = false;
       }
     }
   }
 
   @override
   void dispose() {
-    selectedFilesPaths.clear();
-    thumbnails.clear();
-    directoryPath = "";
+    selectedFilesPaths.value.clear();
+    thumbnails.value.clear();
+    directoryPath.value = "";
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return LoadingOverlay(
-      isLoading: isProcessing,
-      message: "Converting PDFs...",
-      child: Scaffold(
-        backgroundColor: Color(0xfff6f8f6),
-        appBar: AppBar(
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text(
-            "PDF To Image",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-          ),
-        ),
-        body: SafeArea(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                double horizontalPadding = constraints.maxWidth * 0.05;
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        selectedFilesPaths,
+        thumbnails,
+        directoryPath,
+        isProcessing,
+      ]),
+      builder: (context, child) {
+        final value = selectedFilesPaths.value;
 
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Column(
-                    children: [
-                      Text(
-                        "Convert your pdfs into images.",
-                        style: TextStyle(color: Colors.grey.shade500),
-                        textAlign: TextAlign.center,
+        return LoadingOverlay(
+          isLoading: isProcessing.value,
+          message: "Converting PDFs...",
+          child: Scaffold(
+            backgroundColor: Color(0xfff6f8f6),
+            appBar: AppBar(
+              surfaceTintColor: Colors.transparent,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(
+                "PDF To Image",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              ),
+            ),
+            body: SafeArea(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    double horizontalPadding = constraints.maxWidth * 0.05;
+
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
                       ),
-                      const SizedBox(height: 16),
-                      if (selectedFilesPaths.isEmpty)
-                        UploadFile(
-                          subtitle:
-                              "Tap here to select PDFs, PNG from your explorer.",
-                          onPressed: selectFiles,
-                        ),
-                      const SizedBox(height: 16),
-                      if (selectedFilesPaths.isNotEmpty)
-                        FileListHeader(
-                          title: "PDFs",
-                          amount: selectedFilesPaths.length,
-                          onPressed: () {
-                            setState(() {
-                              selectedFilesPaths.clear();
-                              thumbnails.clear();
-                            });
-                          },
-                        ),
-                      const SizedBox(height: 16),
-                      Expanded(
-                        child: selectedFilesPaths.isEmpty
-                            ? const Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.picture_as_pdf_outlined,
-                                      size: 64,
-                                      color: Colors.grey,
-                                    ),
-                                    SizedBox(height: 16),
-                                    Text("Not Found PDFs"),
-                                  ],
-                                ),
-                              )
-                            : ListView.builder(
-                                itemCount: selectedFilesPaths.length,
-                                itemBuilder: (context, index) {
-                                  final title = thumbnails[index];
-                                  return title.isNotEmpty
-                                      ? PdfItem(
-                                          title: title,
-                                          onTap: () {
-                                            removeFiles(index);
-                                          },
-                                        )
-                                      : const Icon(
-                                          Icons.image_not_supported_outlined,
+                      child: Column(
+                        children: [
+                          Text(
+                            "Convert your pdfs into images.",
+                            style: TextStyle(color: Colors.grey.shade500),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          AnimatedSwitcher(
+                            duration: Duration(milliseconds: 200),
+                            child: value.isEmpty
+                                ? UploadFile(
+                                    key: ValueKey("upload"),
+                                    subtitle:
+                                        "Tap here to select PDFs, PNG from your explorer.",
+                                    onPressed: selectFiles,
+                                  )
+                                : FileListHeader(
+                                    key: ValueKey("header"),
+                                    title: "PDFs",
+                                    amount: value.length,
+                                    onPressed: () {
+                                      selectedFilesPaths.value.clear();
+                                      thumbnails.value.clear();
+                                    },
+                                  ),
+                          ),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: value.isEmpty
+                                ? const Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.picture_as_pdf_outlined,
+                                          size: 64,
                                           color: Colors.grey,
-                                        );
-                                },
-                              ),
-                      ),
-                      if (selectedFilesPaths.isNotEmpty) ...[
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomOutlinedButton(
-                                getDirectoryPath: selectFiles,
-                                title: "Add more",
-                                icon: Icons.add_photo_alternate,
-                              ),
+                                        ),
+                                        SizedBox(height: 16),
+                                        Text("Not Found PDFs"),
+                                      ],
+                                    ),
+                                  )
+                                : RepaintBoundary(
+                                    child: ListView.builder(
+                                      itemCount: value.length,
+                                      itemBuilder: (context, index) {
+                                        final title = thumbnails.value[index];
+                                        return title.isNotEmpty
+                                            ? PdfItem(
+                                                title: title,
+                                                onTap: () {
+                                                  removeFiles(index);
+                                                },
+                                              )
+                                            : const Icon(
+                                                Icons
+                                                    .image_not_supported_outlined,
+                                                color: Colors.grey,
+                                              );
+                                      },
+                                    ),
+                                  ),
+                          ),
+                          if (value.isNotEmpty) ...[
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomOutlinedButton(
+                                    getDirectoryPath: selectFiles,
+                                    title: "Add more",
+                                    icon: Icons.add_photo_alternate,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: CustomOutlinedButton(
+                                    getDirectoryPath: getDirectoryPath,
+                                    title: "Folder",
+                                    icon: Icons.folder_open,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: CustomOutlinedButton(
-                                getDirectoryPath: getDirectoryPath,
-                                title: "Folder",
-                                icon: Icons.folder_open,
-                              ),
+                            const SizedBox(height: 12),
+                            CustomElevatedButton(
+                              title: "Convert PDFs",
+                              onPressed: processFiles,
+                              isLoading: isProcessing,
                             ),
                           ],
-                        ),
-                        const SizedBox(height: 12),
-                        CustomElevatedButton(
-                          title: "Convert PDFs",
-                          onPressed: directoryPath.isNotEmpty && !isProcessing
-                              ? processFiles
-                              : () {},
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                );
-              },
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

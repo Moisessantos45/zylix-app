@@ -15,180 +15,183 @@ class OptimizeImageScreen extends StatefulWidget {
 
 class _OptimizeImageScreenState extends State<OptimizeImageScreen>
     with GridScrollMixin<OptimizeImageScreen> {
-  double quantity = 80;
-  String selectQuantity = "Medium";
-  bool isProcessing = false;
+  ValueNotifier<double> quantity = ValueNotifier<double>(80);
+  ValueNotifier<String> selectQuantity = ValueNotifier<String>("Medium");
+  final isProcessing = ValueNotifier<bool>(false);
 
   Future<void> processFiles() async {
-    if (selectedFilesPaths.isEmpty) {
-      showGlobalSnackBar("Selecciona imágenes primero", isError: true);
-      return;
-    }
-    if (directoryPath.isEmpty) {
-      showGlobalSnackBar("Selecciona directorio de salida", isError: true);
-      return;
-    }
+    if (!isSelectionValid()) return;
 
-    setState(() {
-      isProcessing = true;
-    });
+    isProcessing.value = true;
 
     try {
       await NativeBridge.optimizeImage(
-        selectedFilesPaths,
-        quantity.toInt(),
-        directoryPath,
+        selectedFilesPaths.value,
+        int.tryParse(quantity.value.toStringAsFixed(0)) ?? 80,
+        directoryPath.value,
       );
 
       if (mounted) {
         showGlobalSnackBar("¡Optimización exitosa!");
-        setState(() {
-          selectedFilesPaths.clear();
-          thumbnails.clear();
-          directoryPath = "";
-          loadedCount = 0;
-        });
+
+        thumbnails.value.clear();
+        loadedCount.value = 0;
+
+        selectedFilesPaths.value.clear();
+        directoryPath.value = "";
       }
     } on PlatformException catch (e) {
       showGlobalSnackBar("Error: ${e.message}", isError: true);
     } finally {
       if (mounted) {
-        setState(() {
-          isProcessing = false;
-        });
+        isProcessing.value = false;
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return LoadingOverlay(
-      isLoading: isProcessing,
-      message: "Optimize Images",
-      child: Scaffold(
-        backgroundColor: AppColor.backgroundLight,
-        appBar: AppBar(
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text(
-            "Optimize Images",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-          ),
-        ),
-        body: SafeArea(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                double horizontalPadding = constraints.maxWidth * 0.05;
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        selectedFilesPaths,
+        thumbnails,
+        loadedCount,
+        directoryPath,
+        isProcessing,
+        quantity,
+        selectQuantity,
+      ]),
+      builder: (context, child) {
+        final value = selectedFilesPaths.value;
 
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (selectedFilesPaths.isEmpty)
-                        UploadFile(
-                          subtitle:
-                              "Tap here to select JPG, PNG, or GIF files from your gallery.",
-                          onPressed: selectFiles,
-                        ),
-                      const SizedBox(height: 16),
-                      if (selectedFilesPaths.isNotEmpty)
-                        FileListHeader(
-                          title: "Images",
-                          amount: selectedFilesPaths.length,
-                          onPressed: () {
-                            setState(() {
-                              selectedFilesPaths.clear();
-                              thumbnails.clear();
-                              loadedCount = 0;
-                            });
-                          },
-                        ),
-                      const SizedBox(height: 16),
-                      Expanded(
-                        child: selectedFilesPaths.isEmpty
-                            ? const Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.image,
-                                      size: 64,
-                                      color: Colors.grey,
-                                    ),
-                                    SizedBox(height: 16),
-                                    Text("Not Found images"),
-                                  ],
-                                ),
-                              )
-                            : ImageGrid(
-                                items: selectedFilesPaths,
-                                thumbnails: thumbnails,
-                                loadedCount: loadedCount,
-                                scroll: scrollController,
-                                onTap: (value) {
-                                  removeImage(value);
-                                },
-                              ),
+        return LoadingOverlay(
+          isLoading: isProcessing.value,
+          message: "Optimize Images",
+          child: Scaffold(
+            backgroundColor: AppColor.backgroundLight,
+            appBar: AppBar(
+              surfaceTintColor: Colors.transparent,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(
+                "Optimize Images",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              ),
+            ),
+            body: SafeArea(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    double horizontalPadding = constraints.maxWidth * 0.05;
+
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
                       ),
-                      if (selectedFilesPaths.isNotEmpty) ...[
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomOutlinedButton(
-                                getDirectoryPath: selectFiles,
-                                title: "Add more",
-                                icon: Icons.add_photo_alternate,
-                              ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AnimatedSwitcher(
+                            duration: Duration(milliseconds: 200),
+                            child: value.isEmpty
+                                ? UploadFile(
+                                    key: ValueKey("upload"),
+                                    subtitle:
+                                        "Tap here to select JPG, PNG, or GIF files from your gallery.",
+                                    onPressed: selectFiles,
+                                  )
+                                : FileListHeader(
+                                    key: ValueKey("header"),
+                                    title: "Images",
+                                    amount: value.length,
+                                    onPressed: () {
+                                      thumbnails.value.clear();
+                                      loadedCount.value = 0;
+                                      selectedFilesPaths.value.clear();
+                                    },
+                                  ),
+                          ),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: value.isEmpty
+                                ? const Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.image,
+                                          size: 64,
+                                          color: Colors.grey,
+                                        ),
+                                        SizedBox(height: 16),
+                                        Text("Not Found images"),
+                                      ],
+                                    ),
+                                  )
+                                : ImageGrid(
+                                    items: value,
+                                    thumbnails: thumbnails.value,
+                                    loadedCount: loadedCount.value,
+                                    scroll: scrollController,
+                                    onTap: (value) {
+                                      removeImage(value);
+                                    },
+                                  ),
+                          ),
+                          if (value.isNotEmpty) ...[
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomOutlinedButton(
+                                    getDirectoryPath: selectFiles,
+                                    title: "Add more",
+                                    icon: Icons.add_photo_alternate,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: CustomOutlinedButton(
+                                    getDirectoryPath: getDirectoryPath,
+                                    title: "Folder",
+                                    icon: Icons.folder_open,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: CustomOutlinedButton(
-                                getDirectoryPath: getDirectoryPath,
-                                title: "Folder",
-                                icon: Icons.folder_open,
-                              ),
+                            const SizedBox(height: 16),
+                            ImageQualitySelector(
+                              quantity: quantity.value,
+                              select: selectQuantity.value,
+                              onChanged: (value) {
+                                quantity.value =
+                                    double.tryParse(value.toStringAsFixed(0)) ??
+                                    80;
+                              },
+                              onTap: (value, quality) {
+                                quantity.value = quality;
+                                selectQuantity.value = value;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            CustomElevatedButton(
+                              title: "Optimize Images",
+                              onPressed: processFiles,
+                              isLoading: isProcessing,
                             ),
                           ],
-                        ),
-                        const SizedBox(height: 16),
-                        ImageQualitySelector(
-                          quantity: quantity,
-                          select: selectQuantity,
-                          onChanged: (value) {
-                            setState(() {
-                              quantity =
-                                  double.tryParse(value.toStringAsFixed(0)) ??
-                                  80;
-                            });
-                          },
-                          onTap: (value, quality) {
-                            setState(() {
-                              quantity = quality;
-                              selectQuantity = value;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        CustomElevatedButton(
-                          title: "Optimize Images",
-                          onPressed: directoryPath.isNotEmpty
-                              ? processFiles
-                              : () {},
-                        ),
-                      ],
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                );
-              },
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
