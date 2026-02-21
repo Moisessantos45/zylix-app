@@ -20,6 +20,7 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
+| v1.7.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1KhjXZY_3xOL0zP7wVk-tZlLe5FdSZICu/view?usp=sharing) | 2026-02-21 |
 | v1.7.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1Cp8SCh3i2ld_L6t6bwILQ8H9TmNbuw2Q/view?usp=sharing) | 2026-02-21 |
 | v1.4.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1J_AK8LiAZg_hyDwz6LMyTQaUjqcl2L12/view?usp=sharing) | 2026-01-08 |
 | v1.3.0 | Android | [⬇️ Descargar](https://rmovevnbyamzdvslzqaq.supabase.co/storage/v1/object/public/apps/Portafolio/zylix-1.3.0.apk) | 2026-01-03 |
