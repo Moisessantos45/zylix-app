@@ -20,6 +20,7 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
+| v1.7.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1Cp8SCh3i2ld_L6t6bwILQ8H9TmNbuw2Q/view?usp=sharing) | 2026-02-21 |
 | v1.4.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1J_AK8LiAZg_hyDwz6LMyTQaUjqcl2L12/view?usp=sharing) | 2026-01-08 |
 | v1.3.0 | Android | [⬇️ Descargar](https://rmovevnbyamzdvslzqaq.supabase.co/storage/v1/object/public/apps/Portafolio/zylix-1.3.0.apk) | 2026-01-03 |
 | v1.2.0 | Android | [⬇️ Descargar](https://rmovevnbyamzdvslzqaq.supabase.co/storage/v1/object/public/apps/Portafolio/zylix-1.2.0.apk) | 2026-01-01 |
@@ -34,6 +35,14 @@
 2. Habilita la instalación de aplicaciones de fuentes desconocidas en tu dispositivo
 3. Abre el archivo descargado y confirma la instalación
 4. ¡Listo! Ya puedes usar Zylix
+
+## 📝 Historial de Cambios
+
+### v1.7.0+7
+
+- **Optimización de UI/Estado**: Implementación de `ListenableBuilder` y `ValueNotifier` en todas las pantallas para un mejor rendimiento y reactividad.
+- **Refactorización**: Uso de `mixin` en las pantallas de conversión PDF para reutlización de código.
+- **Descargas mejoradas**: La descarga de actualizaciones (APK) desde la sección "Acerca de" ahora utiliza conexiones tipo _stream_, optimizando el uso de memoria y la estabilidad de la descarga.
 
 ## ✨ Características
 
