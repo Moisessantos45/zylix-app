@@ -235,7 +235,7 @@ class _AboutScreenState extends State<AboutScreen> {
                                     ),
                                   ),
                                   child: Text(
-                                    "Versión $versionCode",
+                                    "Versión ${versionCode.value.toString()}",
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 16,
@@ -260,7 +260,8 @@ class _AboutScreenState extends State<AboutScreen> {
                                     InfoItem(
                                       icon: Icons.info_outline,
                                       title: "Versión",
-                                      value: "$versionCode (Build 1)",
+                                      value:
+                                          "${versionCode.value.toString()} (Build 7)",
                                     ),
                                     InfoItem(
                                       icon: Icons.code,
@@ -360,12 +361,7 @@ class _AboutScreenState extends State<AboutScreen> {
                                             MainAxisAlignment.center,
                                         children: [
                                           downloading.value
-                                              ? Icon(
-                                                  Icons.system_update_alt,
-                                                  color: Colors.white,
-                                                  size: 22,
-                                                )
-                                              : SizedBox(
+                                              ? SizedBox(
                                                   width: 22,
                                                   height: 22,
                                                   child:
@@ -373,6 +369,11 @@ class _AboutScreenState extends State<AboutScreen> {
                                                         color: Colors.white,
                                                         strokeWidth: 2,
                                                       ),
+                                                )
+                                              : Icon(
+                                                  Icons.system_update_alt,
+                                                  color: Colors.white,
+                                                  size: 22,
                                                 ),
                                           const SizedBox(width: 12),
                                           Text(
