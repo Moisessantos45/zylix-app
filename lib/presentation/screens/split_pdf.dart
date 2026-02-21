@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zylix/config/service/native_bridge.dart';
 import 'package:zylix/config/utils/snackbar_helper.dart';
+import 'package:zylix/presentation/shared/pdf_file_selector_mixin.dart';
 import 'package:zylix/presentation/widgets/widgets.dart';
 
 class SplitPdfScreen extends StatefulWidget {
@@ -10,39 +11,11 @@ class SplitPdfScreen extends StatefulWidget {
   State<SplitPdfScreen> createState() => _SplitPdfScreenState();
 }
 
-class _SplitPdfScreenState extends State<SplitPdfScreen> {
-  ValueNotifier<List<String>> selectedFilesPaths = ValueNotifier([]);
-  ValueNotifier<List<String>> thumbnails = ValueNotifier([]);
-  ValueNotifier<String> directoryPath = ValueNotifier("");
-  ValueNotifier<bool> isProcessing = ValueNotifier<bool>(false);
+class _SplitPdfScreenState extends State<SplitPdfScreen>
+    with PdfFileSelectorMixin<SplitPdfScreen> {
   ValueNotifier<int?> startPage = ValueNotifier<int?>(null);
   ValueNotifier<int?> endPage = ValueNotifier<int?>(null);
   ValueNotifier<int?> splitAt = ValueNotifier<int?>(null);
-
-  Future<void> selectFiles() async {
-    final files = await NativeBridge.pickMultiplePDFs();
-    debugPrint('Files seleccionadas: $files');
-
-    if (files.isEmpty) return;
-    final filesNames = await NativeBridge.getFileNamesBatch(files);
-
-    selectedFilesPaths.value.addAll(files);
-    thumbnails.value.addAll(filesNames);
-  }
-
-  void removeFiles(int index) {
-    if (index < 0 || index >= selectedFilesPaths.value.length) return;
-
-    selectedFilesPaths.value.removeAt(index);
-    thumbnails.value.removeAt(index);
-  }
-
-  Future<void> getDirectoryPath() async {
-    final directory = await NativeBridge.pickFolder();
-    if (directory == null) return;
-    debugPrint('Directorio seleccionado: $directory');
-    directoryPath.value = directory;
-  }
 
   Future<void> processFiles() async {
     if (selectedFilesPaths.value.isEmpty) {

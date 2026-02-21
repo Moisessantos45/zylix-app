@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zylix/config/service/native_bridge.dart';
 import 'package:zylix/config/utils/snackbar_helper.dart';
+import 'package:zylix/presentation/shared/pdf_file_selector_mixin.dart';
 import 'package:zylix/presentation/widgets/widgets.dart';
 
 class PdfToImageScreen extends StatefulWidget {
@@ -10,37 +11,8 @@ class PdfToImageScreen extends StatefulWidget {
   State<PdfToImageScreen> createState() => _PdfToImageScreenState();
 }
 
-class _PdfToImageScreenState extends State<PdfToImageScreen> {
-  ValueNotifier<List<String>> selectedFilesPaths = ValueNotifier([]);
-  ValueNotifier<List<String>> thumbnails = ValueNotifier([]);
-  ValueNotifier<String> directoryPath = ValueNotifier("");
-  ValueNotifier<bool> isProcessing = ValueNotifier<bool>(false);
-
-  Future<void> selectFiles() async {
-    final files = await NativeBridge.pickMultiplePDFs();
-    debugPrint('Files seleccionadas: $files');
-
-    if (files.isEmpty) return;
-    final filesNames = await NativeBridge.getFileNamesBatch(files);
-    selectedFilesPaths.value.addAll(files);
-    thumbnails.value.addAll(filesNames);
-  }
-
-  void removeFiles(int index) {
-    if (index < 0 || index >= selectedFilesPaths.value.length) return;
-
-    selectedFilesPaths.value.removeAt(index);
-    thumbnails.value.removeAt(index);
-  }
-
-  Future<void> getDirectoryPath() async {
-    final directory = await NativeBridge.pickFolder();
-    if (directory == null) return;
-    debugPrint('Directorio seleccionado: $directory');
-
-    directoryPath.value = directory;
-  }
-
+class _PdfToImageScreenState extends State<PdfToImageScreen>
+    with PdfFileSelectorMixin<PdfToImageScreen> {
   Future<void> processFiles() async {
     if (selectedFilesPaths.value.isEmpty) {
       showGlobalSnackBar("No hay archivos seleccionados.", isError: true);
@@ -76,14 +48,6 @@ class _PdfToImageScreenState extends State<PdfToImageScreen> {
         isProcessing.value = false;
       }
     }
-  }
-
-  @override
-  void dispose() {
-    selectedFilesPaths.value.clear();
-    thumbnails.value.clear();
-    directoryPath.value = "";
-    super.dispose();
   }
 
   @override

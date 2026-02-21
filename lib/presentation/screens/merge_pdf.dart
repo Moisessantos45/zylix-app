@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zylix/config/service/native_bridge.dart';
 import 'package:zylix/config/utils/snackbar_helper.dart';
+import 'package:zylix/presentation/shared/pdf_file_selector_mixin.dart';
 import 'package:zylix/presentation/widgets/widgets.dart';
 
 class MergePdfScreen extends StatefulWidget {
@@ -10,39 +11,8 @@ class MergePdfScreen extends StatefulWidget {
   State<MergePdfScreen> createState() => _MergePdfScreenState();
 }
 
-class _MergePdfScreenState extends State<MergePdfScreen> {
-  ValueNotifier<List<String>> selectedFilesPaths = ValueNotifier<List<String>>(
-    [],
-  );
-  TextEditingController pdfNameController = TextEditingController();
-  ValueNotifier<List<String>> thumbnails = ValueNotifier<List<String>>([]);
-  ValueNotifier<String> directoryPath = ValueNotifier<String>("");
-  ValueNotifier<bool> isProcessing = ValueNotifier<bool>(false);
-
-  Future<void> selectFiles() async {
-    final files = await NativeBridge.pickMultiplePDFs();
-    debugPrint('Files seleccionadas: $files');
-
-    if (files.isEmpty) return;
-    final filesNames = await NativeBridge.getFileNamesBatch(files);
-
-    selectedFilesPaths.value.addAll(files);
-    thumbnails.value.addAll(filesNames);
-  }
-
-  void removeFiles(int index) {
-    if (index < 0 || index >= selectedFilesPaths.value.length) return;
-    selectedFilesPaths.value.removeAt(index);
-    thumbnails.value.removeAt(index);
-  }
-
-  Future<void> getDirectoryPath() async {
-    final directory = await NativeBridge.pickFolder();
-    if (directory == null) return;
-    debugPrint('Directorio seleccionado: $directory');
-    directoryPath.value = directory;
-  }
-
+class _MergePdfScreenState extends State<MergePdfScreen>
+    with PdfFileSelectorMixin<MergePdfScreen> {
   Future<void> processFiles() async {
     if (selectedFilesPaths.value.isEmpty) {
       showGlobalSnackBar("Selecciona PDFs primero", isError: true);
@@ -78,14 +48,6 @@ class _MergePdfScreenState extends State<MergePdfScreen> {
         isProcessing.value = false;
       }
     }
-  }
-
-  @override
-  void dispose() {
-    pdfNameController.dispose();
-    selectedFilesPaths.value.clear();
-    thumbnails.value.clear();
-    super.dispose();
   }
 
   @override
