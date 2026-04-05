@@ -3,6 +3,7 @@ package com.example.zylix
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -10,6 +11,9 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.core.content.FileProvider
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import com.jakewharton.processphoenix.ProcessPhoenix
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -17,6 +21,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.ByteArrayOutputStream
 import java.io.File
+import kotlinx.coroutines.launch
 
 class MainActivity : FlutterActivity() {
     private val TAG = "MainActivity"
@@ -27,6 +32,7 @@ class MainActivity : FlutterActivity() {
     private val PICK_IMAGES = 1001
     private val PICK_PDFS = 1002
     private val PICK_FOLDER = 1003
+    private val SCAN_DOCUMENT = 1004
     private var pendingResult: MethodChannel.Result? = null
     private var pendingRequestCode: Int? = null
 
@@ -381,9 +387,180 @@ class MainActivity : FlutterActivity() {
                         )
                     }
                 }
+                "extractTextFromPdfs" -> {
+                    val pdfPaths = call.argument<List<String>>("pdfPaths")
+                    val outputDirPath = call.argument<String>("outputDirPath")
+                    if (pdfPaths != null && outputDirPath != null) {
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+                            try {
+                                PdfTextExtractorProcessor.extractTextFromPdfs(
+                                        this@MainActivity,
+                                        pdfPaths,
+                                        outputDirPath
+                                )
+                                result.success(null)
+                            } catch (e: Exception) {
+                                Log.e("PDF", "Error in extractTextFromPdfs", e)
+                                result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                            }
+                        }
+                    } else {
+                        result.error(
+                                "INVALID_ARGUMENT",
+                                "PDF paths or output dir path is null",
+                                null
+                        )
+                    }
+                }
+                "removeImageBackground" -> {
+                    val imagePaths = call.argument<List<String>>("imagePaths")
+                    val outputDirPath = call.argument<String>("outputDirPath")
+                    if (imagePaths != null && outputDirPath != null) {
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+                            try {
+                                ImageBgRemoverProcessor.removeBackground(
+                                        this@MainActivity,
+                                        imagePaths,
+                                        outputDirPath
+                                )
+                                result.success(null)
+                            } catch (e: Exception) {
+                                Log.e("IMG", "Error in removeImageBackground", e)
+                                result.error("IMG_ERROR", e.message ?: "Unknown error", null)
+                            }
+                        }
+                    } else {
+                        result.error(
+                                "INVALID_ARGUMENT",
+                                "Image paths or output dir path is null",
+                                null
+                        )
+                    }
+                }
+                "startDocumentScanner" -> {
+                    pendingResult = result
+                    pendingRequestCode = SCAN_DOCUMENT
+                    startDocumentScanner(result)
+                }
+                "rotatePdfs" -> {
+                    val pdfPaths = call.argument<List<String>>("pdfPaths")
+                    val outputDirPath = call.argument<String>("outputDirPath")
+                    val angle = call.argument<Int>("angle") ?: 90
+                    val pageRange = call.argument<String>("pageRange")
+                    if (pdfPaths != null && outputDirPath != null) {
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+                            try {
+                                PdfRotateProcessor.rotatePdfs(
+                                    this@MainActivity,
+                                    pdfPaths,
+                                    outputDirPath,
+                                    angle,
+                                    pageRange,
+                                )
+                                result.success(null)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error in rotatePdfs", e)
+                                result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                            }
+                        }
+                    } else {
+                        result.error("INVALID_ARGUMENT", "PDF paths or output dir is null", null)
+                    }
+                }
+                "addWatermarkToPdfs" -> {
+                    val pdfPaths = call.argument<List<String>>("pdfPaths")
+                    val outputDirPath = call.argument<String>("outputDirPath")
+                    val watermarkText = call.argument<String>("watermarkText") ?: "CONFIDENTIAL"
+                    val opacity = (call.argument<Double>("opacity") ?: 0.3).toFloat()
+                    val fontSize = (call.argument<Double>("fontSize") ?: 48.0).toFloat()
+                    if (pdfPaths != null && outputDirPath != null) {
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+                            try {
+                                PdfWatermarkProcessor.addWatermark(
+                                    this@MainActivity,
+                                    pdfPaths,
+                                    outputDirPath,
+                                    watermarkText,
+                                    opacity,
+                                    fontSize,
+                                )
+                                result.success(null)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error in addWatermarkToPdfs", e)
+                                result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                            }
+                        }
+                    } else {
+                        result.error("INVALID_ARGUMENT", "PDF paths or output dir path is null", null)
+                    }
+                }
+                "copyUriToDirectory" -> {
+                    val sourceUri = call.argument<String>("sourceUri")
+                    val outputDirPath = call.argument<String>("outputDirPath")
+                    val fileName = call.argument<String>("fileName")
+                    if (sourceUri != null && outputDirPath != null && fileName != null) {
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                            try {
+                                val uri = android.net.Uri.parse(sourceUri)
+                                val inputStream = contentResolver.openInputStream(uri)
+                                    ?: throw Exception("Cannot open stream for $sourceUri")
+                                val (outputStream, _) = FileUtils.createOutputFile(
+                                    this@MainActivity, outputDirPath, fileName,
+                                    if (fileName.endsWith(".pdf")) "application/pdf" else "image/jpeg"
+                                ) ?: throw Exception("Cannot create output file")
+                                inputStream.use { inp -> outputStream.use { out -> inp.copyTo(out) } }
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.success(null)
+                                }
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error in copyUriToDirectory", e)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.error("COPY_ERROR", e.message ?: "Unknown error", null)
+                                }
+                            }
+                        }
+                    } else {
+                        result.error("INVALID_ARGUMENT", "Missing arguments", null)
+                    }
+                }
                 else -> result.notImplemented()
             }
         }
+    }
+
+    private fun startDocumentScanner(result: MethodChannel.Result) {
+        val options = GmsDocumentScannerOptions.Builder()
+            .setGalleryImportAllowed(true)
+            .setPageLimit(50)
+            .setResultFormats(
+                GmsDocumentScannerOptions.RESULT_FORMAT_JPEG,
+                GmsDocumentScannerOptions.RESULT_FORMAT_PDF
+            )
+            .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
+            .build()
+
+        val scanner = GmsDocumentScanning.getClient(options)
+        scanner.getStartScanIntent(this)
+            .addOnSuccessListener { intentSender ->
+                try {
+                    startIntentSenderForResult(
+                        intentSender,
+                        SCAN_DOCUMENT,
+                        null, 0, 0, 0
+                    )
+                } catch (e: IntentSender.SendIntentException) {
+                    Log.e(TAG, "Error launching document scanner", e)
+                    pendingResult?.error("SCANNER_ERROR", e.message ?: "SendIntentException", null)
+                    pendingResult = null
+                    pendingRequestCode = null
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Scanner not available", e)
+                pendingResult?.error("SCANNER_UNAVAILABLE", e.message ?: "Scanner unavailable", null)
+                pendingResult = null
+                pendingRequestCode = null
+            }
     }
 
     private fun pickMultipleImagesFromGallery() {
@@ -438,6 +615,22 @@ class MainActivity : FlutterActivity() {
                     result.success(uris)
                 } else {
                     result.success(emptyList<String>())
+                }
+            }
+            SCAN_DOCUMENT -> {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    val scanResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
+                    val imageUris = scanResult?.pages?.map { it.imageUri.toString() } ?: emptyList()
+                    val pdfUri = scanResult?.pdf?.uri?.toString()
+                    val pageCount = scanResult?.pdf?.pageCount ?: 0
+                    result.success(mapOf(
+                        "imageUris" to imageUris,
+                        "pdfUri" to pdfUri,
+                        "pageCount" to pageCount
+                    ))
+                } else {
+                    // Usuario canceló el escaneo
+                    result.success(null)
                 }
             }
             PICK_FOLDER -> {
