@@ -20,6 +20,7 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
+| v1.8.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1ur96ZLVEyBtFh060GHc1VttjQUXen5F9/view?usp=sharing) | 2026-04-05 |
 | v1.7.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1KhjXZY_3xOL0zP7wVk-tZlLe5FdSZICu/view?usp=sharing) | 2026-02-21 |
 | v1.7.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1Cp8SCh3i2ld_L6t6bwILQ8H9TmNbuw2Q/view?usp=sharing) | 2026-02-21 |
 | v1.4.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1J_AK8LiAZg_hyDwz6LMyTQaUjqcl2L12/view?usp=sharing) | 2026-01-08 |
@@ -39,10 +40,21 @@
 
 ## 📝 Historial de Cambios
 
+### v1.8.0+8 — 2026-04-05
+
+> **6 nuevas herramientas** de procesamiento offline integradas en esta versión.
+
+- **📷 Document Scanner**: Escanea documentos físicos con la cámara usando Google ML Kit Document Scanner. La UI de captura es nativa de Android. Permite hasta 50 páginas, con vista previa en Flutter antes de guardar y elección de formato: PDF o JPG.
+- **💧 Watermark PDF**: Añade texto diagonal semitransparente (marca de agua) a todas las páginas de uno o varios PDFs. El usuario puede personalizar el texto y la opacidad (10%–90%). Procesado nativamente con iTextG.
+- **🔄 Rotate PDF**: Rota páginas de PDFs a 90° ↻, 180° o 90° ↺. Permite aplicar la rotación a todas las páginas o solo a un rango específico (ej: `1,3-5`). Procesado con iTextG sin pérdida de calidad.
+- **✂️ Crop & Rotate Image**: Recorta y rota imágenes con precisión usando la librería UCrop (integrada vía `image_cropper`). Soporta múltiples proporciones y rotación libre. El resultado se guarda en la carpeta elegida.
+- **📝 Extraer Texto de PDF**: Extrae el texto raw de PDFs digitales procesados en hilos separados. Guarda el resultado como archivo `.txt`. Usa iTextG internamente.
+- **🧹 Quitar Fondo (Remove Background)**: Elimina el fondo de fotos de personas o selfies usando ML Kit Selfie Segmentation. Exporta como PNG con canal alfa transparente.
+
 ### v1.7.0+7
 
 - **Optimización de UI/Estado**: Implementación de `ListenableBuilder` y `ValueNotifier` en todas las pantallas para un mejor rendimiento y reactividad.
-- **Refactorización**: Uso de `mixin` en las pantallas de conversión PDF para reutlización de código.
+- **Refactorización**: Uso de `mixin` en las pantallas de conversión PDF para reutilización de código.
 - **Descargas mejoradas**: La descarga de actualizaciones (APK) desde la sección "Acerca de" ahora utiliza conexiones tipo _stream_, optimizando el uso de memoria y la estabilidad de la descarga.
 
 ## ✨ Características
@@ -51,25 +63,37 @@
 
 - **Comprimir PDF**: Reduce el tamaño de archivos PDF manteniendo la calidad
 - **Unir PDFs**: Combina múltiples archivos PDF en un solo documento
+- **Separar PDF**: Extrae rangos de páginas en documentos independientes
 - **PDF a Imágenes**: Convierte páginas de PDF a imágenes de alta calidad
 - **Imágenes a PDF**: Crea documentos PDF a partir de múltiples imágenes
+- **Extraer Texto**: Extrae el texto original de PDFs digitales a archivos `.txt`
+- **Marca de Agua**: Añade texto diagonal semitransparente a cada página del PDF
+- **Rotar Páginas**: Rota todas o páginas específicas de un PDF a 90°, 180° o 270°
 
 ### 🖼️ Herramientas de Imagen
 
 - **Comprimir Imágenes**: Reduce el tamaño de las imágenes manteniendo la calidad visual
 - **Conversión de Formatos**: Soporte para JPG, JPEG, PNG, BMP, TIFF y WEBP
-- **Optimización Inteligente**: Compresión adaptativa según el tipo de imagen
+- **Quitar Fondo**: Elimina el fondo de selfies y fotos de personas usando IA (ML Kit)
+- **Recortar & Rotar**: Recorta y rota imágenes con herramientas de precisión (UCrop)
+
+### 📷 Utilidades
+
+- **Escáner de Documentos**: Escanea documentos físicos con la cámara, con recorte y corrección de perspectiva automáticos. Exporta como PDF o JPG.
 
 ## 🛠️ Stack Tecnológico
 
 ### Frontend
 - **[Flutter](https://flutter.dev)**: Framework multiplataforma para desarrollo móvil
 - **[Dart](https://dart.dev)**: Lenguaje de programación principal
+- **[image_cropper](https://pub.dev/packages/image_cropper)**: Recorte y rotación de imágenes (UCrop)
 
-### Backend/Nativo
-- **[Kotlin](https://kotlinlang.org)**: Código nativo Android para procesamiento eficiente
-- **[PDFBox Android](https://github.com/TomRoush/PdfBox-Android)**: Biblioteca para manipulación de PDFs
-- **Android ImageDecoder**: Procesamiento nativo de imágenes
+### Backend/Nativo (Android — Kotlin)
+- **[iTextG 5.5.10](https://github.com/itext/itextpdf)**: Manipulación avanzada de PDFs (merge, split, compress, watermark, rotate, extract text)
+- **[Google ML Kit — Document Scanner](https://developers.google.com/ml-kit)**: Escaneo nativo de documentos con corrección de perspectiva
+- **[Google ML Kit — Selfie Segmentation](https://developers.google.com/ml-kit)**: Eliminación de fondos en imágenes de personas
+- **[PDFBox Android](https://github.com/TomRoush/PdfBox-Android)**: Renderizado de páginas PDF a imágenes
+- **Kotlin Coroutines**: Procesamiento paralelo sin bloquear el hilo principal
 
 ## 📦 Requisitos de Desarrollo
 
