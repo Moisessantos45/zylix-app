@@ -277,4 +277,104 @@ class NativeBridge {
       throw Exception('Error converting image format: $e');
     }
   }
+
+  static Future<void> extractTextFromPdfs(
+    List<String> pdfPaths,
+    String outputDirPath,
+  ) async {
+    try {
+      await _channel.invokeMethod('extractTextFromPdfs', {
+        'pdfPaths': pdfPaths,
+        'outputDirPath': outputDirPath,
+      });
+    } catch (e) {
+      debugPrint('Error in extractTextFromPdfs: $e');
+      throw Exception('Error extracting text from PDF: $e');
+    }
+  }
+
+  static Future<void> removeImageBackground(
+    List<String> imagePaths,
+    String outputDirPath,
+  ) async {
+    try {
+      await _channel.invokeMethod('removeImageBackground', {
+        'imagePaths': imagePaths,
+        'outputDirPath': outputDirPath,
+      });
+    } catch (e) {
+      debugPrint('Error in removeImageBackground: $e');
+      throw Exception('Error removing background from images: $e');
+    }
+  }
+
+  static Future<void> rotatePdfs(
+    List<String> pdfPaths,
+    String outputDirPath, {
+    required int angle,
+    String? pageRange,
+  }) async {
+    try {
+      await _channel.invokeMethod('rotatePdfs', {
+        'pdfPaths': pdfPaths,
+        'outputDirPath': outputDirPath,
+        'angle': angle,
+        pageRange != null ? 'pageRange': pageRange : null,
+      });
+    } catch (e) {
+      debugPrint('Error in rotatePdfs: $e');
+      throw Exception('Error rotating PDFs: $e');
+    }
+  }
+
+  static Future<void> addWatermarkToPdfs(
+    List<String> pdfPaths,
+    String outputDirPath, {
+    required String watermarkText,
+    double opacity = 0.3,
+    double fontSize = 48.0,
+  }) async {
+    try {
+      await _channel.invokeMethod('addWatermarkToPdfs', {
+        'pdfPaths': pdfPaths,
+        'outputDirPath': outputDirPath,
+        'watermarkText': watermarkText,
+        'opacity': opacity,
+        'fontSize': fontSize,
+      });
+    } catch (e) {
+      debugPrint('Error in addWatermarkToPdfs: $e');
+      throw Exception('Error adding watermark: $e');
+    }
+  }
+
+  static Future<void> copyUriToDirectory(
+    String sourceUri,
+    String outputDirPath,
+    String fileName,
+  ) async {
+    try {
+      await _channel.invokeMethod('copyUriToDirectory', {
+        'sourceUri': sourceUri,
+        'outputDirPath': outputDirPath,
+        'fileName': fileName,
+      });
+    } catch (e) {
+      debugPrint('Error in copyUriToDirectory: $e');
+      throw Exception('Error copying file: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>?> scanDocument() async {
+    try {
+      final result = await _channel.invokeMapMethod<String, dynamic>(
+        'startDocumentScanner',
+      );
+      return result;
+    } catch (e) {
+      debugPrint('Error in scanDocument: $e');
+      throw Exception('Error starting document scanner: $e');
+    }
+  }
 }
+
