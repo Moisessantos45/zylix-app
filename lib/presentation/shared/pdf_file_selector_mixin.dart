@@ -17,14 +17,14 @@ mixin PdfFileSelectorMixin<T extends StatefulWidget> on State<T> {
     if (files.isEmpty) return;
     final filesNames = await NativeBridge.getFileNamesBatch(files);
 
-    selectedFilesPaths.value.addAll(files);
-    thumbnails.value.addAll(filesNames);
+    selectedFilesPaths.value = List<String>.from(selectedFilesPaths.value)..addAll(files);
+    thumbnails.value = List<String>.from(thumbnails.value)..addAll(filesNames);
   }
 
   void removeFiles(int index) {
     if (index < 0 || index >= selectedFilesPaths.value.length) return;
-    selectedFilesPaths.value.removeAt(index);
-    thumbnails.value.removeAt(index);
+    selectedFilesPaths.value = List<String>.from(selectedFilesPaths.value)..removeAt(index);
+    thumbnails.value = List<String>.from(thumbnails.value)..removeAt(index);
   }
 
   Future<void> getDirectoryPath() async {
