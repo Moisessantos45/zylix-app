@@ -41,3 +41,45 @@
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn com.gemalto.jp2.JP2Decoder
 -dontwarn com.gemalto.jp2.JP2Encoder
+
+
+# Please add these rules to your existing keep rules in order to suppress warnings.
+# This is generated automatically by the Android Gradle plugin.
+-dontwarn org.spongycastle.asn1.ASN1Encodable
+-dontwarn org.spongycastle.asn1.ASN1InputStream
+-dontwarn org.spongycastle.asn1.ASN1Integer
+-dontwarn org.spongycastle.asn1.ASN1ObjectIdentifier
+-dontwarn org.spongycastle.asn1.ASN1OctetString
+-dontwarn org.spongycastle.asn1.ASN1Primitive
+-dontwarn org.spongycastle.asn1.ASN1Set
+-dontwarn org.spongycastle.asn1.DEROctetString
+-dontwarn org.spongycastle.asn1.DEROutputStream
+-dontwarn org.spongycastle.asn1.DERSet
+-dontwarn org.spongycastle.asn1.cms.ContentInfo
+-dontwarn org.spongycastle.asn1.cms.EncryptedContentInfo
+-dontwarn org.spongycastle.asn1.cms.EnvelopedData
+-dontwarn org.spongycastle.asn1.cms.IssuerAndSerialNumber
+-dontwarn org.spongycastle.asn1.cms.KeyTransRecipientInfo
+-dontwarn org.spongycastle.asn1.cms.OriginatorInfo
+-dontwarn org.spongycastle.asn1.cms.RecipientIdentifier
+-dontwarn org.spongycastle.asn1.cms.RecipientInfo
+-dontwarn org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers
+-dontwarn org.spongycastle.asn1.x500.X500Name
+-dontwarn org.spongycastle.asn1.x509.AlgorithmIdentifier
+-dontwarn org.spongycastle.asn1.x509.SubjectPublicKeyInfo
+-dontwarn org.spongycastle.asn1.x509.TBSCertificateStructure
+-dontwarn org.spongycastle.cert.X509CertificateHolder
+-dontwarn org.spongycastle.cms.CMSEnvelopedData
+-dontwarn org.spongycastle.cms.Recipient
+-dontwarn org.spongycastle.cms.RecipientId
+-dontwarn org.spongycastle.cms.RecipientInformation
+-dontwarn org.spongycastle.cms.RecipientInformationStore
+-dontwarn org.spongycastle.cms.jcajce.JceKeyTransEnvelopedRecipient
+-dontwarn org.spongycastle.cms.jcajce.JceKeyTransRecipient
+-dontwarn org.spongycastle.crypto.BlockCipher
+-dontwarn org.spongycastle.crypto.CipherParameters
+-dontwarn org.spongycastle.crypto.engines.AESFastEngine
+-dontwarn org.spongycastle.crypto.modes.CBCBlockCipher
+-dontwarn org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher
+-dontwarn org.spongycastle.crypto.params.KeyParameter
+-dontwarn org.spongycastle.crypto.params.ParametersWithIV
