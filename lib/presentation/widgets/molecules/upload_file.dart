@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zylix/presentation/shared/color.dart';
-import 'package:zylix/presentation/widgets/custom_outlined_button.dart';
+import 'package:zylix/presentation/widgets/atoms/custom_outlined_button.dart';
 
 class UploadFile extends StatelessWidget {
   final String subtitle;

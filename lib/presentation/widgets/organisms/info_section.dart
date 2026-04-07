@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zylix/presentation/widgets/info_card.dart';
+import 'package:zylix/presentation/widgets/molecules/info_card.dart';
 
 class InfoItem {
   final IconData icon;
