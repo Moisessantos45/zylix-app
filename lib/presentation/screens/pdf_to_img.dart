@@ -37,8 +37,8 @@ class _PdfToImageScreenState extends State<PdfToImageScreen>
 
       if (mounted) {
         showGlobalSnackBar("¡Conversión exitosa!");
-        selectedFilesPaths.value.clear();
-        thumbnails.value.clear();
+        selectedFilesPaths.value = [];
+        thumbnails.value = [];
         directoryPath.value = "";
       }
     } catch (e) {
@@ -109,8 +109,8 @@ class _PdfToImageScreenState extends State<PdfToImageScreen>
                                     title: "PDFs",
                                     amount: value.length,
                                     onPressed: () {
-                                      selectedFilesPaths.value.clear();
-                                      thumbnails.value.clear();
+                                      selectedFilesPaths.value = [];
+                                      thumbnails.value = [];
                                     },
                                   ),
                           ),

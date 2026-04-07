@@ -44,8 +44,8 @@ class _SplitPdfScreenState extends State<SplitPdfScreen>
 
       if (mounted) {
         showGlobalSnackBar("¡PDFs divididos exitosamente!");
-        selectedFilesPaths.value.clear();
-        thumbnails.value.clear();
+        selectedFilesPaths.value = [];
+        thumbnails.value = [];
         directoryPath.value = "";
         startPage.value = null;
         endPage.value = null;
@@ -62,8 +62,8 @@ class _SplitPdfScreenState extends State<SplitPdfScreen>
 
   @override
   void dispose() {
-    selectedFilesPaths.value.clear();
-    thumbnails.value.clear();
+    selectedFilesPaths.value = [];
+    thumbnails.value = [];
     directoryPath.value = "";
     startPage.value = null;
     endPage.value = null;
@@ -179,8 +179,8 @@ class _SplitPdfScreenState extends State<SplitPdfScreen>
                               title: "PDFs",
                               amount: value.length,
                               onPressed: () {
-                                selectedFilesPaths.value.clear();
-                                thumbnails.value.clear();
+                                selectedFilesPaths.value = [];
+                                thumbnails.value = [];
                               },
                             ),
                           const SizedBox(height: 16),

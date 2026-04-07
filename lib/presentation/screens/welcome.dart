@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zylix/config/service/native_bridge.dart';
 import 'package:zylix/presentation/screens/home.dart';
 import 'package:zylix/presentation/shared/color.dart';
-import 'package:zylix/presentation/widgets/custom_elevated_button.dart';
+import 'package:zylix/presentation/widgets/atoms/custom_elevated_button.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});

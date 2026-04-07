@@ -34,10 +34,10 @@ class _OptimizeImageScreenState extends State<OptimizeImageScreen>
       if (mounted) {
         showGlobalSnackBar("¡Optimización exitosa!");
 
-        thumbnails.value.clear();
+        thumbnails.value = [];
         loadedCount.value = 0;
 
-        selectedFilesPaths.value.clear();
+        selectedFilesPaths.value = [];
         directoryPath.value = "";
       }
     } on PlatformException catch (e) {
@@ -106,9 +106,9 @@ class _OptimizeImageScreenState extends State<OptimizeImageScreen>
                                     title: "Images",
                                     amount: value.length,
                                     onPressed: () {
-                                      thumbnails.value.clear();
+                                      thumbnails.value = [];
                                       loadedCount.value = 0;
-                                      selectedFilesPaths.value.clear();
+                                      selectedFilesPaths.value = [];
                                     },
                                   ),
                           ),

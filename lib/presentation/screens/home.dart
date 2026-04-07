@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zylix/presentation/screens/screens.dart';
 import 'package:zylix/presentation/shared/color.dart';
-import 'package:zylix/presentation/widgets/tool_grid_card.dart';
+import 'package:zylix/presentation/widgets/organisms/tool_grid_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -165,6 +165,50 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         ),
+                        ToolGridCard(
+                          icon: Icons.text_snippet,
+                          title: "Extract Text",
+                          description:
+                              "Extract text easily from your PDF documents",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ExtractTextPdfScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        ToolGridCard(
+                          icon: Icons.water_drop_outlined,
+                          title: "Watermark",
+                          description:
+                              "Add a custom text watermark to every PDF page",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const WatermarkPdfScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        ToolGridCard(
+                          icon: Icons.rotate_right_outlined,
+                          title: "Rotate PDF",
+                          description:
+                              "Rotate all or specific pages of a PDF",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const RotatePdfScreen(),
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
 
@@ -227,9 +271,71 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         ),
+                        ToolGridCard(
+                          icon: Icons.person_remove_alt_1_outlined,
+                          title: "Remove Bg",
+                          description:
+                              "Delete backgrounds from selfies seamlessly",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const RemoveBgImageScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        ToolGridCard(
+                          icon: Icons.crop_rotate,
+                          title: "Crop & Rotate",
+                          description:
+                              "Crop and rotate images with precision",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const CropRotateImageScreen(),
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
 
+                    const SizedBox(height: 32),
+                    _buildSectionHeader(
+                      icon: Icons.build_outlined,
+                      title: "Utilities",
+                      color: AppColor.primaryColor,
+                    ),
+                    const SizedBox(height: 16),
+                    GridView.count(
+                      crossAxisCount: crossAxisCount,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 0.85,
+                      children: [
+                        ToolGridCard(
+                          icon: Icons.document_scanner_outlined,
+                          title: "Doc Scanner",
+                          description:
+                              "Scan physical documents and save as PDF or JPG",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const DocumentScannerScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 32),
                   ],
                 ),

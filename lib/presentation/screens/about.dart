@@ -5,7 +5,7 @@ import 'package:zylix/config/config.dart';
 import 'package:zylix/config/service/native_bridge.dart';
 import 'package:zylix/config/utils/snackbar_helper.dart';
 import 'package:zylix/presentation/shared/color.dart';
-import 'package:zylix/presentation/widgets/info_section.dart';
+import 'package:zylix/presentation/widgets/organisms/info_section.dart';
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});

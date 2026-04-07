@@ -33,10 +33,10 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen>
       if (mounted) {
         showGlobalSnackBar("¡PDF creado exitosamente!");
 
-        thumbnails.value.clear();
+        thumbnails.value = [];
         loadedCount.value = 0;
 
-        selectedFilesPaths.value.clear();
+        selectedFilesPaths.value = [];
         directoryPath.value = "";
         pdfNameController.clear();
       }
@@ -109,9 +109,9 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen>
                                     title: "Images",
                                     amount: value.length,
                                     onPressed: () {
-                                      thumbnails.value.clear();
+                                      thumbnails.value = [];
                                       loadedCount.value = 0;
-                                      selectedFilesPaths.value.clear();
+                                      selectedFilesPaths.value = [];
                                     },
                                   ),
                           ),

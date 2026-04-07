@@ -36,8 +36,8 @@ class _MergePdfScreenState extends State<MergePdfScreen>
       if (mounted) {
         showGlobalSnackBar("¡PDFs fusionados exitosamente!");
 
-        selectedFilesPaths.value.clear();
-        thumbnails.value.clear();
+        selectedFilesPaths.value = [];
+        thumbnails.value = [];
         directoryPath.value = "";
         pdfNameController.clear();
       }
@@ -108,8 +108,8 @@ class _MergePdfScreenState extends State<MergePdfScreen>
                                     title: "PDFs",
                                     amount: value.length,
                                     onPressed: () {
-                                      selectedFilesPaths.value.clear();
-                                      thumbnails.value.clear();
+                                      selectedFilesPaths.value = [];
+                                      thumbnails.value = [];
                                     },
                                   ),
                           ),

@@ -36,9 +36,9 @@ class _ImageToFormatConverterScreenState
       if (mounted) {
         showGlobalSnackBar("Images convertidas exitosamente!");
 
-        thumbnails.value.clear();
+        thumbnails.value = [];
         loadedCount.value = 0;
-        selectedFilesPaths.value.clear();
+        selectedFilesPaths.value = [];
         directoryPath.value = '';
         selectedFormat.value = "PNG";
       }
@@ -106,9 +106,9 @@ class _ImageToFormatConverterScreenState
                                     title: "Images",
                                     amount: value.length,
                                     onPressed: () {
-                                      thumbnails.value.clear();
+                                      thumbnails.value = [];
                                       loadedCount.value = 0;
-                                      selectedFilesPaths.value.clear();
+                                      selectedFilesPaths.value = [];
                                       selectedFormat.value = "PNG";
                                     },
                                   ),

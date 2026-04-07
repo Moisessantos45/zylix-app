@@ -66,8 +66,8 @@ class _OptimizePdfScreenState extends State<OptimizePdfScreen> {
       if (mounted) {
         showGlobalSnackBar("¡Optimización exitosa!");
 
-        selectedFilesPaths.value.clear();
-        thumbnails.value.clear();
+        selectedFilesPaths.value = [];
+        thumbnails.value = [];
         directoryPath.value = "";
       }
     } catch (e) {
@@ -81,8 +81,8 @@ class _OptimizePdfScreenState extends State<OptimizePdfScreen> {
 
   @override
   void dispose() {
-    selectedFilesPaths.value.clear();
-    thumbnails.value.clear();
+    selectedFilesPaths.value = [];
+    thumbnails.value = [];
     directoryPath.value = "";
     super.dispose();
   }
@@ -147,8 +147,8 @@ class _OptimizePdfScreenState extends State<OptimizePdfScreen> {
                                     title: "PDFs",
                                     amount: value.length,
                                     onPressed: () {
-                                      selectedFilesPaths.value.clear();
-                                      thumbnails.value.clear();
+                                      selectedFilesPaths.value = [];
+                                      thumbnails.value = [];
                                     },
                                   ),
                           ),
