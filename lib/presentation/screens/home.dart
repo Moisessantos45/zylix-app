@@ -3,14 +3,9 @@ import 'package:zylix/presentation/screens/screens.dart';
 import 'package:zylix/presentation/shared/color.dart';
 import 'package:zylix/presentation/widgets/organisms/tool_grid_card.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,12 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColor.primaryColor.withAlpha(77),
+                      color: AppColor.primaryColor.withAlpha(30),
                       blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -66,36 +61,49 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            double horizontalPadding = constraints.maxWidth * 0.05;
+            double horizontalPadding = constraints.maxWidth > 800 
+                ? (constraints.maxWidth - 800) / 2 
+                : constraints.maxWidth * 0.05;
+            if (horizontalPadding < 24) horizontalPadding = 24.0;
             int crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
 
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+            return TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.translate(
+                    offset: Offset(0, 20 * (1 - value)),
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 32),
                     const Text(
                       "All Your Productivity Tools in One Place",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 30,
+                        fontSize: 32,
+                        height: 1.2,
                       ),
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.left,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       "Easily convert, merge, and optimize your files with our suite of powerful tools.",
                       style: TextStyle(
                         color: Colors.grey.shade600,
-                        fontSize: 15,
+                        fontSize: 16,
                       ),
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.left,
                     ),
                     const SizedBox(height: 32),
-                    _buildSectionHeader(
+                    const SectionHeader(
                       icon: Icons.picture_as_pdf,
                       title: "PDF Tools",
                       color: AppColor.primaryColor,
@@ -213,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     const SizedBox(height: 32),
-                    _buildSectionHeader(
+                    const SectionHeader(
                       icon: Icons.image,
                       title: "Image Tools",
                       color: AppColor.primaryColor,
@@ -305,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     const SizedBox(height: 32),
-                    _buildSectionHeader(
+                    const SectionHeader(
                       icon: Icons.build_outlined,
                       title: "Utilities",
                       color: AppColor.primaryColor,
@@ -340,6 +348,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
+            ),
+                  ),
+                );
+              },
             );
           },
         ),
@@ -347,11 +359,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSectionHeader({
-    required IconData icon,
-    required String title,
-    required Color color,
-  }) {
+}
+
+class SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final Color color;
+
+  const SectionHeader({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         Container(
@@ -362,12 +385,12 @@ class _HomeScreenState extends State<HomeScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: color.withAlpha(75),
+                color: color.withAlpha(30),
                 blurRadius: 6,
-                offset: const Offset(0, 2),
+                offset: const Offset(0, 3),
               ),
             ],
           ),

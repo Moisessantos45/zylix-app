@@ -20,9 +20,10 @@ class CustomOutlinedButton extends StatelessWidget {
       icon: Icon(icon),
       label: Text(title),
       style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        side: BorderSide(color: AppColor.primaryColor, width: 1.5),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        side: BorderSide(color: AppColor.primaryColor.withAlpha(80), width: 1.0),
+        elevation: 0,
       ),
     );
   }

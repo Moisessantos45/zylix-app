@@ -77,25 +77,36 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen>
               surfaceTintColor: Colors.transparent,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Text(
+              title: const Text(
                 "Images To PDF",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
               ),
             ),
             body: SafeArea(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    double horizontalPadding = constraints.maxWidth * 0.05;
-                    return Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AnimatedSwitcher(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  double horizontalPadding = constraints.maxWidth > 800 
+                      ? (constraints.maxWidth - 800) / 2 
+                      : constraints.maxWidth * 0.05;
+                  if (horizontalPadding < 24) horizontalPadding = 24.0;
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 16),
+                        Text(
+                          "Convert your photos into a single PDF document.",
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 16),
+                        AnimatedSwitcher(
                             duration: Duration(milliseconds: 200),
                             child: value.isEmpty
                                 ? UploadFile(
@@ -116,17 +127,37 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen>
                                   ),
                           ),
                           if (value.isNotEmpty)
-                            TextField(
-                              controller: pdfNameController,
-                              decoration: const InputDecoration(
-                                labelText: 'Name the PDF',
-                                suffixText: '.pdf',
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withAlpha(15),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: TextField(
+                                controller: pdfNameController,
+                                decoration: InputDecoration(
+                                  labelText: 'Name the PDF',
+                                  suffixText: '.pdf',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                ),
                               ),
                             ),
                           const SizedBox(height: 16),
                           Expanded(
                             child: value.isEmpty
-                                ? const Center(
+                                ? Center(
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -134,10 +165,16 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen>
                                         Icon(
                                           Icons.image,
                                           size: 64,
-                                          color: Colors.grey,
+                                          color: Colors.grey.shade400,
                                         ),
-                                        SizedBox(height: 16),
-                                        Text("Not Found Images"),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          "Not Found Images",
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 16,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   )
@@ -188,9 +225,8 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen>
                 ),
               ),
             ),
-          ),
-        );
-      },
-    );
-  }
+          );
+        },
+      );
+    }
 }

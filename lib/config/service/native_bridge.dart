@@ -79,6 +79,14 @@ class NativeBridge {
     }
   }
 
+  static Future<void> clearCache() async {
+    try {
+      await _channel.invokeMethod("clearCache");
+    } catch (e) {
+      debugPrint("Error clearing cache: $e");
+    }
+  }
+
   static Future<bool> saveKeyValue(String key, bool value) async {
     try {
       await _channel.invokeMethod('save-key-value', {
@@ -171,6 +179,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in imgToPdf: $e');
       throw Exception('Error converting image to PDF: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -186,6 +196,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in pdfToImg: $e');
       throw Exception('Error converting PDF to image: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -203,6 +215,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in mergePdfs: $e');
       throw Exception('Error merging PDFs: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -224,6 +238,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in splitPdf: $e');
       throw Exception('Error splitting PDF: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -241,6 +257,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in optimizePdf: $e');
       throw Exception('Error optimizing PDF: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -258,6 +276,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in optimizeImage: $e');
       throw Exception('Error optimizing image: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -275,6 +295,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in convertImgFormat: $e');
       throw Exception('Error converting image format: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -290,6 +312,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in extractTextFromPdfs: $e');
       throw Exception('Error extracting text from PDF: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -305,6 +329,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in removeImageBackground: $e');
       throw Exception('Error removing background from images: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -324,6 +350,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in rotatePdfs: $e');
       throw Exception('Error rotating PDFs: $e');
+    } finally {
+      await clearCache();
     }
   }
 
@@ -345,6 +373,8 @@ class NativeBridge {
     } catch (e) {
       debugPrint('Error in addWatermarkToPdfs: $e');
       throw Exception('Error adding watermark: $e');
+    } finally {
+      await clearCache();
     }
   }
 

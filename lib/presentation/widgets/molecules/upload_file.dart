@@ -13,37 +13,45 @@ class UploadFile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(width: 2, color: AppColor.primaryColor.withAlpha(50)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(width: 1, color: AppColor.primaryColor.withAlpha(30)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.image_outlined,
-            size: 32,
-            color: AppColor.primaryColor,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColor.primaryColor.withAlpha(20),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.upload_file_outlined,
+              size: 28,
+              color: AppColor.primaryColor,
+            ),
           ),
-          const SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 24),
+          const Text(
             "Upload Files",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            textAlign: TextAlign.left,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             subtitle,
-            style: TextStyle(color: Colors.grey.shade500),
-            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+            textAlign: TextAlign.left,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 24),
           SizedBox(
-            width: width * 0.5,
+            width: double.infinity,
             child: CustomOutlinedButton(
               getDirectoryPath: onPressed,
               title: "Select Files",

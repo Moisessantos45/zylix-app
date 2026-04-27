@@ -35,35 +35,34 @@ class _ToolGridCardState extends State<ToolGridCard> {
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        transform: Matrix4.identity()..scale(_isPressed ? 0.95 : 1.0),
+        transform: Matrix4.identity()
+          ..scaleByDouble(
+            _isPressed ? 0.95 : 1.0,
+            _isPressed ? 0.95 : 1.0,
+            _isPressed ? 0.95 : 1.0,
+            1.0,
+          ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColor.primaryColor.withAlpha(300),
-            width: 2,
+            color: AppColor.primaryColor.withAlpha(30),
+            width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColor.primaryColor.withAlpha(_isPressed ? 150 : 75),
-              blurRadius: _isPressed ? 1 : 2,
-              offset: Offset(0, _isPressed ? 1 : 1),
-            ),
-          ],
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: widget.onTap,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(12),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -73,16 +72,9 @@ class _ToolGridCardState extends State<ToolGridCard> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColor.primaryColor.withAlpha(30),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(widget.icon, color: Colors.white, size: 32),
+                    child: Icon(widget.icon, color: Colors.white, size: 28),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -92,7 +84,7 @@ class _ToolGridCardState extends State<ToolGridCard> {
                       fontSize: 16,
                       color: Color(0xFF1a1a1a),
                     ),
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -106,7 +98,7 @@ class _ToolGridCardState extends State<ToolGridCard> {
                         fontSize: 12,
                         height: 1.3,
                       ),
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.left,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),

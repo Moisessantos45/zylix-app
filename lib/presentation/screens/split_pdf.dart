@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zylix/config/service/native_bridge.dart';
 import 'package:zylix/config/utils/snackbar_helper.dart';
+import 'package:zylix/presentation/shared/color.dart';
 import 'package:zylix/presentation/shared/pdf_file_selector_mixin.dart';
 import 'package:zylix/presentation/widgets/widgets.dart';
 
@@ -89,7 +90,7 @@ class _SplitPdfScreenState extends State<SplitPdfScreen>
           isLoading: isProcessing.value,
           message: "Splitting PDFs...",
           child: Scaffold(
-            backgroundColor: Color(0xfff6f8f6),
+            backgroundColor: AppColor.backgroundLight,
             appBar: AppBar(
               surfaceTintColor: Colors.transparent,
               backgroundColor: Colors.transparent,
@@ -131,30 +132,68 @@ class _SplitPdfScreenState extends State<SplitPdfScreen>
                                     key: ValueKey("options"),
                                     children: [
                                       Expanded(
-                                        child: TextField(
-                                          keyboardType: TextInputType.number,
-                                          decoration: const InputDecoration(
-                                            labelText: 'Start Page',
-                                            hintText: 'e.g., 1',
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withAlpha(15),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
                                           ),
-                                          onChanged: (value) {
-                                            startPage.value = int.tryParse(
-                                              value,
-                                            );
-                                          },
+                                          child: TextField(
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              labelText: 'Start Page',
+                                              hintText: 'e.g., 1',
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                                borderSide: BorderSide.none,
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.white,
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                            ),
+                                            onChanged: (value) {
+                                              startPage.value = int.tryParse(value);
+                                            },
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
-                                        child: TextField(
-                                          keyboardType: TextInputType.number,
-                                          decoration: const InputDecoration(
-                                            labelText: 'End Page',
-                                            hintText: 'e.g., 10',
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withAlpha(15),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
                                           ),
-                                          onChanged: (value) {
-                                            endPage.value = int.tryParse(value);
-                                          },
+                                          child: TextField(
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              labelText: 'End Page',
+                                              hintText: 'e.g., 10',
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                                borderSide: BorderSide.none,
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.white,
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                            ),
+                                            onChanged: (value) {
+                                              endPage.value = int.tryParse(value);
+                                            },
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -162,15 +201,35 @@ class _SplitPdfScreenState extends State<SplitPdfScreen>
                           ),
                           if (value.isNotEmpty) ...[
                             const SizedBox(height: 12),
-                            TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: 'Split At (page number)',
-                                hintText: 'e.g., 5',
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withAlpha(15),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                              onChanged: (value) {
-                                splitAt.value = int.tryParse(value);
-                              },
+                              child: TextField(
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  labelText: 'Split At (page number)',
+                                  hintText: 'e.g., 5',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                ),
+                                onChanged: (value) {
+                                  splitAt.value = int.tryParse(value);
+                                },
+                              ),
                             ),
                           ],
                           const SizedBox(height: 16),
@@ -186,18 +245,23 @@ class _SplitPdfScreenState extends State<SplitPdfScreen>
                           const SizedBox(height: 16),
                           Expanded(
                             child: value.isEmpty
-                                ? const Center(
+                                ? Center(
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.picture_as_pdf_outlined,
                                           size: 64,
-                                          color: Colors.grey,
+                                          color: Colors.grey.shade400,
                                         ),
-                                        SizedBox(height: 16),
-                                        Text("Not Found PDFs"),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          "Not Found PDFs",
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 16,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   )

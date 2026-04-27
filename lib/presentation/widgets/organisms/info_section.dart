@@ -40,10 +40,11 @@ class InfoSection extends StatelessWidget {
         ),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.withAlpha(30), width: 1),
           ),
           child: Column(
             children: items.map((item) {

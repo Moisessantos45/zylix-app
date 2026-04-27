@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zylix/config/service/native_bridge.dart';
 import 'package:zylix/config/utils/snackbar_helper.dart';
+import 'package:zylix/presentation/shared/color.dart';
 import 'package:zylix/presentation/shared/pdf_file_selector_mixin.dart';
 import 'package:zylix/presentation/widgets/widgets.dart';
 
@@ -65,135 +66,168 @@ class _MergePdfScreenState extends State<MergePdfScreen>
           isLoading: isProcessing.value,
           message: "Merging PDFs...",
           child: Scaffold(
-            backgroundColor: Color(0xfff6f8f6),
+            backgroundColor: AppColor.backgroundLight,
             appBar: AppBar(
               surfaceTintColor: Colors.transparent,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Text(
-                "Marge PDFs",
+              title: const Text(
+                "Merge PDFs",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
               ),
             ),
             body: SafeArea(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    double horizontalPadding = constraints.maxWidth * 0.05;
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  double horizontalPadding = constraints.maxWidth > 800
+                      ? (constraints.maxWidth - 800) / 2
+                      : constraints.maxWidth * 0.05;
+                  if (horizontalPadding < 24) horizontalPadding = 24.0;
 
-                    return Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Convert your photos into a single PDF document.",
-                            style: TextStyle(color: Colors.grey.shade500),
-                            textAlign: TextAlign.center,
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 16),
+                        Text(
+                          "Combine multiple PDF files into a single document seamlessly.",
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 16,
                           ),
-                          const SizedBox(height: 16),
-                          AnimatedSwitcher(
-                            duration: Duration(milliseconds: 200),
-                            child: value.isEmpty
-                                ? UploadFile(
-                                    key: ValueKey("upload"),
-                                    subtitle:
-                                        "Tap here to select PDFs, PNG from your explorer.",
-                                    onPressed: selectFiles,
-                                  )
-                                : FileListHeader(
-                                    key: ValueKey("header"),
-                                    title: "PDFs",
-                                    amount: value.length,
-                                    onPressed: () {
-                                      selectedFilesPaths.value = [];
-                                      thumbnails.value = [];
-                                    },
-                                  ),
-                          ),
-                          if (value.isNotEmpty)
-                            TextField(
-                              controller: pdfNameController,
-                              decoration: const InputDecoration(
-                                labelText: 'Name the PDF',
-                                suffixText: '.pdf',
-                              ),
-                            ),
-                          const SizedBox(height: 16),
-                          Expanded(
-                            child: value.isEmpty
-                                ? const Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.picture_as_pdf_outlined,
-                                          size: 64,
-                                          color: Colors.grey,
-                                        ),
-                                        SizedBox(height: 16),
-                                        Text("Not Found PDFs"),
-                                      ],
-                                    ),
-                                  )
-                                : RepaintBoundary(
-                                    child: ListView.builder(
-                                      itemCount: value.length,
-                                      physics: BouncingScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        final title = thumbnails.value[index];
-                                        return title.isNotEmpty
-                                            ? PdfItem(
-                                                title: title,
-                                                onTap: () {
-                                                  removeFiles(index);
-                                                },
-                                              )
-                                            : const Icon(
-                                                Icons
-                                                    .image_not_supported_outlined,
-                                                color: Colors.grey,
-                                              );
-                                      },
-                                    ),
-                                  ),
-                          ),
-                          if (value.isNotEmpty) ...[
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomOutlinedButton(
-                                    getDirectoryPath: selectFiles,
-                                    title: "Add more",
-                                    icon: Icons.add_photo_alternate,
-                                  ),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 16),
+                        AnimatedSwitcher(
+                          duration: Duration(milliseconds: 200),
+                          child: value.isEmpty
+                              ? UploadFile(
+                                  key: ValueKey("upload"),
+                                  subtitle:
+                                      "Tap here to select PDFs, PNG from your explorer.",
+                                  onPressed: selectFiles,
+                                )
+                              : FileListHeader(
+                                  key: ValueKey("header"),
+                                  title: "PDFs",
+                                  amount: value.length,
+                                  onPressed: () {
+                                    selectedFilesPaths.value = [];
+                                    thumbnails.value = [];
+                                  },
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: CustomOutlinedButton(
-                                    getDirectoryPath: getDirectoryPath,
-                                    title: "Folder",
-                                    icon: Icons.folder_open,
-                                  ),
+                        ),
+                        if (value.isNotEmpty)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withAlpha(15),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            CustomElevatedButton(
-                              title: "Merge PDFs",
-                              onPressed: processFiles,
-                              isLoading: isProcessing,
+                            child: TextField(
+                              controller: pdfNameController,
+                              decoration: InputDecoration(
+                                labelText: 'Name the PDF',
+                                suffixText: '.pdf',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
                             ),
-                          ],
-                          const SizedBox(height: 16),
+                          ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: value.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.picture_as_pdf_outlined,
+                                        size: 64,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        "Not Found PDFs",
+                                        style: TextStyle(
+                                          color: Colors.grey.shade600,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : RepaintBoundary(
+                                  child: ListView.builder(
+                                    itemCount: value.length,
+                                    physics: BouncingScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      final title = thumbnails.value[index];
+                                      return title.isNotEmpty
+                                          ? PdfItem(
+                                              title: title,
+                                              onTap: () {
+                                                removeFiles(index);
+                                              },
+                                            )
+                                          : const Icon(
+                                              Icons
+                                                  .image_not_supported_outlined,
+                                              color: Colors.grey,
+                                            );
+                                    },
+                                  ),
+                                ),
+                        ),
+                        if (value.isNotEmpty) ...[
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomOutlinedButton(
+                                  getDirectoryPath: selectFiles,
+                                  title: "Add more",
+                                  icon: Icons.add_photo_alternate,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: CustomOutlinedButton(
+                                  getDirectoryPath: getDirectoryPath,
+                                  title: "Folder",
+                                  icon: Icons.folder_open,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          CustomElevatedButton(
+                            title: "Merge PDFs",
+                            onPressed: processFiles,
+                            isLoading: isProcessing,
+                          ),
                         ],
-                      ),
-                    );
-                  },
-                ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ),

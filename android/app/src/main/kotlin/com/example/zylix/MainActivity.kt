@@ -523,6 +523,14 @@ class MainActivity : FlutterActivity() {
                         result.error("INVALID_ARGUMENT", "Missing arguments", null)
                     }
                 }
+                "clearCache" -> {
+                    kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                        clearAppCache()
+                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                            result.success(null)
+                        }
+                    }
+                }
                 else -> result.notImplemented()
             }
         }
@@ -705,5 +713,36 @@ class MainActivity : FlutterActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        clearAppCache()
+    }
+
+    private fun clearAppCache() {
+        try {
+            val cacheDir = context.cacheDir
+            if (cacheDir != null && cacheDir.isDirectory) {
+                deleteDir(cacheDir)
+            }
+            val externalCacheDir = context.externalCacheDir
+            if (externalCacheDir != null && externalCacheDir.isDirectory) {
+                deleteDir(externalCacheDir)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error clearing cache", e)
+        }
+    }
+
+    private fun deleteDir(dir: File?): Boolean {
+        if (dir != null && dir.isDirectory) {
+            val children = dir.list()
+            if (children != null) {
+                for (i in children.indices) {
+                    val success = deleteDir(File(dir, children[i]))
+                    if (!success) {
+                        return false
+                    }
+                }
+            }
+        }
+        return dir?.delete() ?: false
     }
 }

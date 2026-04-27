@@ -160,28 +160,29 @@ class _AboutScreenState extends State<AboutScreen> {
             ),
           ),
           body: SafeArea(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 500),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  double horizontalPadding = constraints.maxWidth * 0.05;
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                double horizontalPadding = constraints.maxWidth > 800 
+                    ? (constraints.maxWidth - 800) / 2 
+                    : constraints.maxWidth * 0.05;
+                if (horizontalPadding < 24) horizontalPadding = 24.0;
 
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: horizontalPadding,
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            physics: const BouncingScrollPhysics(),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const SizedBox(height: 24),
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 24),
                                 Container(
-                                  width: 120,
-                                  height: 120,
+                                  width: 96,
+                                  height: 96,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -191,20 +192,18 @@ class _AboutScreenState extends State<AboutScreen> {
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
-                                    borderRadius: BorderRadius.circular(30),
+                                    borderRadius: BorderRadius.circular(24),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColor.primaryColor.withAlpha(
-                                          100,
-                                        ),
-                                        blurRadius: 20,
-                                        spreadRadius: 3,
+                                        color: AppColor.primaryColor.withAlpha(30),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4),
                                       ),
                                     ],
                                   ),
                                   child: const Icon(
                                     Icons.rocket_launch,
-                                    size: 60,
+                                    size: 48,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -222,11 +221,11 @@ class _AboutScreenState extends State<AboutScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
-                                    vertical: 10,
+                                    vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
                                     color: AppColor.primaryColor,
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
                                       color: AppColor.primaryColor.withAlpha(
                                         77,
@@ -246,7 +245,7 @@ class _AboutScreenState extends State<AboutScreen> {
                                 const SizedBox(height: 16),
                                 Text(
                                   "La aplicación Zylix es una herramienta innovadora diseñada para optimizar y simplificar la gestión de documentos PDF. Con una interfaz intuitiva y funcionalidades avanzadas, Zylix permite a los usuarios dividir, fusionar, comprimir y convertir archivos PDF de manera eficiente. Ya sea para uso personal o profesional, Zylix ofrece una solución completa para todas las necesidades relacionadas con documentos PDF.",
-                                  textAlign: TextAlign.center,
+                                  textAlign: TextAlign.left,
                                   style: TextStyle(
                                     color: Colors.grey.shade600,
                                     fontSize: 14,
@@ -329,13 +328,11 @@ class _AboutScreenState extends State<AboutScreen> {
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(8),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColor.primaryColor.withAlpha(
-                                          77,
-                                        ),
-                                        blurRadius: 12,
+                                        color: AppColor.primaryColor.withAlpha(30),
+                                        blurRadius: 8,
                                         offset: const Offset(0, 4),
                                       ),
                                     ],
@@ -352,7 +349,7 @@ class _AboutScreenState extends State<AboutScreen> {
                                         shadowColor: Colors.transparent,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
-                                            16,
+                                            8,
                                           ),
                                         ),
                                       ),
@@ -395,7 +392,7 @@ class _AboutScreenState extends State<AboutScreen> {
                                 const SizedBox(height: 32),
                                 Text(
                                   "© ${currentDate.year} Zylix. Todos los derechos reservados.",
-                                  textAlign: TextAlign.center,
+                                  textAlign: TextAlign.left,
                                   style: TextStyle(
                                     color: Colors.grey.shade600,
                                     fontSize: 12,
@@ -412,9 +409,8 @@ class _AboutScreenState extends State<AboutScreen> {
                 },
               ),
             ),
-          ),
-        );
-      },
-    );
-  }
+          );
+        },
+      );
+    }
 }
