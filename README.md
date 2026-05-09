@@ -20,6 +20,7 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
+| v1.9.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/10nuKuxbxuS1BiNVHR6OEKUiFb9s7O1Cf/view?usp=sharing) | 2026-05-09 |
 | v1.8.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1ur96ZLVEyBtFh060GHc1VttjQUXen5F9/view?usp=sharing) | 2026-04-05 |
 | v1.7.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1KhjXZY_3xOL0zP7wVk-tZlLe5FdSZICu/view?usp=sharing) | 2026-02-21 |
 | v1.7.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1Cp8SCh3i2ld_L6t6bwILQ8H9TmNbuw2Q/view?usp=sharing) | 2026-02-21 |
@@ -39,6 +40,12 @@
 4. ¡Listo! Ya puedes usar Zylix
 
 ## 📝 Historial de Cambios
+
+### v1.9.1+10 — 2026-05-09
+
+- **Optimización de Inicio**: Se corrigió el parpadeo de la vista de bienvenida (WelcomeScreen) al iniciar la aplicación, mostrando un indicador de carga nativo y transicionando directamente a Home si el usuario ya había entrado previamente.
+- **Navegación Personalizada**: Implementación de una navegación nativa con efecto de desvanecimiento (*fade*) en todas las pantallas (reemplazando transiciones por defecto) sin depender de librerías externas.
+- **Splash Screen (Android)**: Se ajustaron las dimensiones del logo (`mi_logo`) en el `launch_background.xml` para mejorar la visualización en la pantalla de carga nativa.
 
 ### v1.8.0+8 — 2026-04-05
 
