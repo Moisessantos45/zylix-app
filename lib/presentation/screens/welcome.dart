@@ -13,23 +13,22 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  final isLoading = ValueNotifier<bool>(false);
+  final isLoading = ValueNotifier<bool>(true);
 
   Future<void> saveInitialData() async {
     await NativeBridge.saveKeyValue("firstInit", true);
   }
 
   Future<void> checkFirstInit() async {
-    isLoading.value = true;
-
     bool firstInit = await NativeBridge.getKeyValue("firstInit");
     if (mounted) {
-      isLoading.value = false;
       if (firstInit) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
+      } else {
+        isLoading.value = false;
       }
     }
   }
