@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zylix/presentation/screens/screens.dart';
 import 'package:zylix/presentation/shared/color.dart';
 import 'package:zylix/presentation/widgets/organisms/tool_grid_card.dart';
+import 'package:zylix/config/utils/custom_navigator.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -49,10 +50,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AboutScreen()),
-                );
+                CustomNavigator.pushFade(context, const AboutScreen());
               },
             ),
           ),
@@ -123,12 +121,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Combine multiple files into one seamless document",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MergePdfScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const MergePdfScreen());
                           },
                         ),
                         ToolGridCard(
@@ -137,12 +130,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Divide your PDFs into individual pages or custom ranges",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SplitPdfScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const SplitPdfScreen());
                           },
                         ),
                         ToolGridCard(
@@ -151,12 +139,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Reduce file size significantly without losing quality",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const OptimizePdfScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const OptimizePdfScreen());
                           },
                         ),
                         ToolGridCard(
@@ -165,12 +148,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Transform your PDF pages into high-quality images",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const PdfToImageScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const PdfToImageScreen());
                           },
                         ),
                         ToolGridCard(
@@ -179,12 +157,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Extract text easily from your PDF documents",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ExtractTextPdfScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const ExtractTextPdfScreen());
                           },
                         ),
                         ToolGridCard(
@@ -193,13 +166,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Add a custom text watermark to every PDF page",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const WatermarkPdfScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const WatermarkPdfScreen());
                           },
                         ),
                         ToolGridCard(
@@ -208,13 +175,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Rotate all or specific pages of a PDF",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const RotatePdfScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const RotatePdfScreen());
                           },
                         ),
                       ],
@@ -241,12 +202,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Convert multiple images into one seamless document",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ImageToPdfScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const ImageToPdfScreen());
                           },
                         ),
                         ToolGridCard(
@@ -255,13 +211,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Reduce file size significantly without losing quality",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const OptimizeImageScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const OptimizeImageScreen());
                           },
                         ),
                         ToolGridCard(
@@ -270,13 +220,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Switch between JPG, PNG and WebP formats",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const ImageToFormatConverterScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const ImageToFormatConverterScreen());
                           },
                         ),
                         ToolGridCard(
@@ -285,13 +229,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Delete backgrounds from selfies seamlessly",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const RemoveBgImageScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const RemoveBgImageScreen());
                           },
                         ),
                         ToolGridCard(
@@ -300,13 +238,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Crop and rotate images with precision",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const CropRotateImageScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const CropRotateImageScreen());
                           },
                         ),
                       ],
@@ -333,13 +265,7 @@ class HomeScreen extends StatelessWidget {
                           description:
                               "Scan physical documents and save as PDF or JPG",
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const DocumentScannerScreen(),
-                              ),
-                            );
+                            CustomNavigator.pushFade(context, const DocumentScannerScreen());
                           },
                         ),
                       ],
