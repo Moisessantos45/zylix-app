@@ -86,7 +86,7 @@ mixin GridScrollMixin<T extends StatefulWidget> on State<T> {
       selectedFilesPaths.value.length,
     );
 
-    if (start >= selectedFilesPaths.value.length) return;
+    if (start >= selectedFilesPaths.value.length || start >= end) return;
 
     debugPrint('Cargando batch $start-$end');
 
@@ -98,39 +98,33 @@ mixin GridScrollMixin<T extends StatefulWidget> on State<T> {
     );
 
     if (mounted) {
+      final updated = List<Uint8List?>.from(thumbnails.value);
       for (int i = 0; i < batchBytes.length; i++) {
-        thumbnails.value[start + i] = batchBytes[i];
+        updated[start + i] = batchBytes[i];
       }
+      thumbnails.value = updated;
       loadedCount.value = end;
     }
   }
 
   Future<void> loadNewImagesBatch(int startIndex) async {
-    int currentIndex = startIndex;
-
-    while (currentIndex < selectedFilesPaths.value.length) {
-      final end = (currentIndex + BATCH_SIZE).clamp(
-        0,
-        selectedFilesPaths.value.length,
-      );
-
-      debugPrint('Cargando nuevas imágenes: $currentIndex-$end');
-
-      final batchUris = selectedFilesPaths.value.sublist(currentIndex, end);
+    int current = startIndex;
+    while (current < selectedFilesPaths.value.length) {
+      final end = (current + BATCH_SIZE).clamp(0, selectedFilesPaths.value.length);
+      final batchUris = selectedFilesPaths.value.sublist(current, end);
       final batchBytes = await ContentUriImageProvider.loadThumbnailsBatch(
         uris: batchUris,
         maxSize: 200,
         quality: 75,
       );
-
-      if (mounted) {
-        for (int i = 0; i < batchBytes.length; i++) {
-          thumbnails.value[currentIndex + i] = batchBytes[i];
-        }
-        loadedCount.value = end;
+      if (!mounted) return;
+      final updated = List<Uint8List?>.from(thumbnails.value);
+      for (int i = 0; i < batchBytes.length; i++) {
+        updated[current + i] = batchBytes[i];
       }
-
-      currentIndex = end;
+      thumbnails.value = updated;
+      loadedCount.value = end;
+      current = end;
     }
   }
 

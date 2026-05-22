@@ -21,7 +21,7 @@ class _RemoveBgImageScreenState extends State<RemoveBgImageScreen>
     if (!isSelectionValid()) return;
 
     isProcessing.value = true;
-
+    await Future.delayed(Duration.zero);
     try {
       await NativeBridge.removeImageBackground(
         selectedFilesPaths.value,

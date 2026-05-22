@@ -29,6 +29,7 @@ class _ExtractTextPdfScreenState extends State<ExtractTextPdfScreen>
     }
 
     isProcessing.value = true;
+    await Future.delayed(Duration.zero);
 
     try {
       await NativeBridge.extractTextFromPdfs(

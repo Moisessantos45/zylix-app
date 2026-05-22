@@ -37,6 +37,7 @@ class _RotatePdfScreenState extends State<RotatePdfScreen>
         : _pageRangeController.text.trim();
 
     isProcessing.value = true;
+    await Future.delayed(Duration.zero);
     try {
       await NativeBridge.rotatePdfs(
         selectedFilesPaths.value,

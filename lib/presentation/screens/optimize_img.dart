@@ -23,6 +23,7 @@ class _OptimizeImageScreenState extends State<OptimizeImageScreen>
     if (!isSelectionValid()) return;
 
     isProcessing.value = true;
+    await Future.delayed(Duration.zero);
 
     try {
       await NativeBridge.optimizeImage(

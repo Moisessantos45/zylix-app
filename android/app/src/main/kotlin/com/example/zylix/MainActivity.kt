@@ -172,66 +172,71 @@ class MainActivity : FlutterActivity() {
                             call.argument<List<Map<String, Any>>>("configs")
                                     ?: uriList.map { mapOf("maxSize" to 200, "quality" to 80) }
 
-                    val byteArrays = mutableListOf<ByteArray>()
+                    kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                        val byteArrays = mutableListOf<ByteArray>()
 
-                    uriList.forEachIndexed { index, uriString ->
-                        try {
-                            val config =
-                                    configs.getOrNull(index)
-                                            ?: mapOf("maxSize" to 200, "quality" to 80)
-                            val maxSize = (config["maxSize"] as? Int) ?: 200
-                            val quality = (config["quality"] as? Int) ?: 80
+                        uriList.forEachIndexed { index, uriString ->
+                            try {
+                                val config =
+                                        configs.getOrNull(index)
+                                                ?: mapOf("maxSize" to 200, "quality" to 80)
+                                val maxSize = (config["maxSize"] as? Int) ?: 200
+                                val quality = (config["quality"] as? Int) ?: 80
 
-                            val imageUri = Uri.parse(uriString)
+                                val imageUri = Uri.parse(uriString)
 
-                            val imageBytes =
-                                    contentResolver.openInputStream(imageUri)?.use {
-                                        it.readBytes()
-                                    }
+                                val imageBytes =
+                                        contentResolver.openInputStream(imageUri)?.use {
+                                            it.readBytes()
+                                        }
 
-                            if (imageBytes != null && imageBytes.isNotEmpty()) {
-                                val options =
-                                        BitmapFactory.Options().apply {
-                                            inJustDecodeBounds = true
+                                if (imageBytes != null && imageBytes.isNotEmpty()) {
+                                    val options =
+                                            BitmapFactory.Options().apply {
+                                                inJustDecodeBounds = true
+                                                BitmapFactory.decodeByteArray(
+                                                        imageBytes,
+                                                        0,
+                                                        imageBytes.size,
+                                                        this
+                                                )
+                                                inSampleSize =
+                                                        ImageProcessor.calculateInSampleSize(
+                                                                this,
+                                                                maxSize,
+                                                                maxSize
+                                                        )
+                                                inJustDecodeBounds = false
+                                            }
+
+                                    val bitmap =
                                             BitmapFactory.decodeByteArray(
                                                     imageBytes,
                                                     0,
                                                     imageBytes.size,
-                                                    this
+                                                    options
                                             )
-                                            inSampleSize =
-                                                    ImageProcessor.calculateInSampleSize(
-                                                            this,
-                                                            maxSize,
-                                                            maxSize
-                                                    )
-                                            inJustDecodeBounds = false
-                                        }
-
-                                val bitmap =
-                                        BitmapFactory.decodeByteArray(
-                                                imageBytes,
-                                                0,
-                                                imageBytes.size,
-                                                options
-                                        )
-                                if (bitmap != null) {
-                                    val stream = ByteArrayOutputStream()
-                                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
-                                    byteArrays.add(stream.toByteArray())
-                                    bitmap.recycle()
+                                    if (bitmap != null) {
+                                        val stream = ByteArrayOutputStream()
+                                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
+                                        byteArrays.add(stream.toByteArray())
+                                        bitmap.recycle()
+                                    } else {
+                                        byteArrays.add(ByteArray(0))
+                                    }
                                 } else {
                                     byteArrays.add(ByteArray(0))
                                 }
-                            } else {
+                            } catch (e: Exception) {
+                                Log.e("THUMBNAIL", "Error loading thumbnail for $uriString", e)
                                 byteArrays.add(ByteArray(0))
                             }
-                        } catch (e: Exception) {
-                            Log.e("THUMBNAIL", "Error loading thumbnail for $uriString", e)
-                            byteArrays.add(ByteArray(0))
+                        }
+
+                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                            result.success(byteArrays.map { it.toList() })
                         }
                     }
-                    result.success(byteArrays.map { it.toList() })
                 }
                 "getFileNamesBatch" -> getFileNamesBatch(call, result)
                 "imgToPdf" -> {
@@ -239,12 +244,18 @@ class MainActivity : FlutterActivity() {
                     val pdfName = call.argument<String>("pdfName") ?: "output"
                     val outputPath = call.argument<String>("outputPath")
                     if (imagePaths != null && outputPath != null) {
-                        try {
-                            PdfProcessor.imgToPdf(this, imagePaths, pdfName, outputPath)
-                            result.success(null)
-                        } catch (e: Exception) {
-                            Log.e("PDF", "Error in imgToPdf", e)
-                            result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                            try {
+                                PdfProcessor.imgToPdf(this@MainActivity, imagePaths, pdfName, outputPath)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.success(null)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("PDF", "Error in imgToPdf", e)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                                }
+                            }
                         }
                     } else {
                         result.error("INVALID_ARGUMENT", "Image paths or output path is null", null)
@@ -254,12 +265,18 @@ class MainActivity : FlutterActivity() {
                     val pdfPaths = call.argument<List<String>>("pdfPaths")
                     val outputDirPath = call.argument<String>("outputDirPath")
                     if (pdfPaths != null && outputDirPath != null) {
-                        try {
-                            PdfProcessor.pdfsToImages(this, pdfPaths, outputDirPath)
-                            result.success(null)
-                        } catch (e: Exception) {
-                            Log.e("PDF", "Error in pdfsToImages", e)
-                            result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                            try {
+                                PdfProcessor.pdfsToImages(this@MainActivity, pdfPaths, outputDirPath)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.success(null)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("PDF", "Error in pdfsToImages", e)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                                }
+                            }
                         }
                     } else {
                         result.error(
@@ -274,8 +291,19 @@ class MainActivity : FlutterActivity() {
                     val outputName = call.argument<String>("outputName") ?: "output"
                     val outputDirPath = call.argument<String>("outputDirPath")
                     if (pdfPaths != null && outputDirPath != null) {
-                        PdfProcessor.mergePdfs(this, pdfPaths, outputName, outputDirPath)
-                        result.success(null)
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                            try {
+                                PdfProcessor.mergePdfs(this@MainActivity, pdfPaths, outputName, outputDirPath)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.success(null)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("PDF", "Error in mergePdfs", e)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                                }
+                            }
+                        }
                     } else {
                         result.error(
                                 "INVALID_ARGUMENT",
@@ -289,12 +317,18 @@ class MainActivity : FlutterActivity() {
                     val outputDirPath = call.argument<String>("outputDirPath")
                     val quality = call.argument<Int>("quality") ?: 75
                     if (pdfPaths != null && outputDirPath != null) {
-                        try {
-                            PdfProcessor.optimizePdfs(this, pdfPaths, outputDirPath, quality)
-                            result.success(null)
-                        } catch (e: Exception) {
-                            Log.e("PDF", "Error in optimizePdfs", e)
-                            result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                            try {
+                                PdfProcessor.optimizePdfs(this@MainActivity, pdfPaths, outputDirPath, quality)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.success(null)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("PDF", "Error in optimizePdfs", e)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                                }
+                            }
                         }
                     } else {
                         result.error(
@@ -311,19 +345,25 @@ class MainActivity : FlutterActivity() {
                     val maxWidth = call.argument<Int>("maxWidth") ?: 1920
                     val maxHeight = call.argument<Int>("maxHeight") ?: 2560
                     if (imagePaths != null && outputDirPath != null) {
-                        try {
-                            ImageProcessor.optimizeImages(
-                                    this,
-                                    imagePaths,
-                                    outputDirPath,
-                                    quality,
-                                    maxWidth,
-                                    maxHeight
-                            )
-                            result.success(null)
-                        } catch (e: Exception) {
-                            Log.e("IMG", "Error in optimizeImages", e)
-                            result.error("IMG_ERROR", e.message ?: "Unknown error", null)
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                            try {
+                                ImageProcessor.optimizeImages(
+                                        this@MainActivity,
+                                        imagePaths,
+                                        outputDirPath,
+                                        quality,
+                                        maxWidth,
+                                        maxHeight
+                                )
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.success(null)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("IMG", "Error in optimizeImages", e)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.error("IMG_ERROR", e.message ?: "Unknown error", null)
+                                }
+                            }
                         }
                     } else {
                         result.error(
@@ -338,17 +378,23 @@ class MainActivity : FlutterActivity() {
                     val outputDirPath = call.argument<String>("outputDirPath")
                     val targetFormat = call.argument<String>("targetFormat") ?: "WEBP_LOSSY"
                     if (imagePaths != null && outputDirPath != null) {
-                        try {
-                            ImageProcessor.convertImagesToFormat(
-                                    this,
-                                    imagePaths,
-                                    outputDirPath,
-                                    targetFormat
-                            )
-                            result.success(null)
-                        } catch (e: Exception) {
-                            Log.e("IMG", "Error in convertImagesToFormat", e)
-                            result.error("IMG_ERROR", e.message ?: "Unknown error", null)
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                            try {
+                                ImageProcessor.convertImagesToFormat(
+                                        this@MainActivity,
+                                        imagePaths,
+                                        outputDirPath,
+                                        targetFormat
+                                )
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.success(null)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("IMG", "Error in convertImagesToFormat", e)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.error("IMG_ERROR", e.message ?: "Unknown error", null)
+                                }
+                            }
                         }
                     } else {
                         result.error(
@@ -365,19 +411,25 @@ class MainActivity : FlutterActivity() {
                     val endPage = call.argument<Int>("endPage") ?: -1
                     val splitAt = call.argument<Int>("splitAt") ?: 1
                     if (pdfPaths != null && outputDirPath != null) {
-                        try {
-                            PdfProcessor.splitPdfs(
-                                    this,
-                                    pdfPaths,
-                                    outputDirPath,
-                                    startPage,
-                                    endPage,
-                                    splitAt
-                            )
-                            result.success(null)
-                        } catch (e: Exception) {
-                            Log.e("PDF", "Error in splitPdfs", e)
-                            result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                            try {
+                                PdfProcessor.splitPdfs(
+                                        this@MainActivity,
+                                        pdfPaths,
+                                        outputDirPath,
+                                        startPage,
+                                        endPage,
+                                        splitAt
+                                )
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.success(null)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("PDF", "Error in splitPdfs", e)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                                }
+                            }
                         }
                     } else {
                         result.error(
@@ -391,17 +443,21 @@ class MainActivity : FlutterActivity() {
                     val pdfPaths = call.argument<List<String>>("pdfPaths")
                     val outputDirPath = call.argument<String>("outputDirPath")
                     if (pdfPaths != null && outputDirPath != null) {
-                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
                             try {
                                 PdfTextExtractorProcessor.extractTextFromPdfs(
                                         this@MainActivity,
                                         pdfPaths,
                                         outputDirPath
                                 )
-                                result.success(null)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.success(null)
+                                }
                             } catch (e: Exception) {
                                 Log.e("PDF", "Error in extractTextFromPdfs", e)
-                                result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    result.error("PDF_ERROR", e.message ?: "Unknown error", null)
+                                }
                             }
                         }
                     } else {

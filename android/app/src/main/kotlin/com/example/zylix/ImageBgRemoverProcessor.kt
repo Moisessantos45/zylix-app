@@ -26,7 +26,8 @@ object ImageBgRemoverProcessor {
             val segmenter = Segmentation.getClient(options)
             
             try {
-                imagePaths.forEach { inputPath ->
+                val sortedPaths = ImageProcessor.sortedByName(context, imagePaths)
+                sortedPaths.forEach { inputPath ->
                     processSingleImage(context, segmenter, inputPath, outputDirPath)
                 }
             } finally {

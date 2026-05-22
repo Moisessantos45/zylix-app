@@ -39,6 +39,8 @@ class _WatermarkPdfScreenState extends State<WatermarkPdfScreen>
     }
 
     isProcessing.value = true;
+    await Future.delayed(Duration.zero);
+    
     try {
       await NativeBridge.addWatermarkToPdfs(
         selectedFilesPaths.value,

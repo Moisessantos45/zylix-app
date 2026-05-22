@@ -33,7 +33,7 @@ class _SplitPdfScreenState extends State<SplitPdfScreen>
     }
 
     isProcessing.value = true;
-
+    await Future.delayed(Duration.zero);
     try {
       await NativeBridge.splitPdf(
         selectedFilesPaths.value,

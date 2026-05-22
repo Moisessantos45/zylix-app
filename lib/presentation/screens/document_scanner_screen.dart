@@ -72,6 +72,7 @@ class _DocumentScannerScreenState extends State<DocumentScannerScreen> {
       return;
     }
     _isSaving.value = true;
+    await Future.delayed(Duration.zero);
     try {
       await NativeBridge.copyUriToDirectory(
         pdfUri,

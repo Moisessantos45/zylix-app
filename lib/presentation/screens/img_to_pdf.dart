@@ -22,7 +22,7 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen>
     if (!isSelectionValid()) return;
 
     isProcessing.value = true;
-
+    await Future.delayed(Duration.zero);
     try {
       await NativeBridge.imgToPdf(
         selectedFilesPaths.value,

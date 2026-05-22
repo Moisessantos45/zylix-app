@@ -14,9 +14,41 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 
-/** Procesador de imágenes para optimización, conversión y manipulación. */
 object ImageProcessor {
     private const val TAG = "ImageProcessor"
+
+    private val PURE_NUMBER_REGEX = Regex("""^\d+$""")
+    private val UNDERSCORE_NUMBER_REGEX = Regex("""_(\d+)""")
+
+    private fun extractSortKey(context: Context, path: String): String {
+        val rawName = UriHelper.getFileNameFromPath(context, path)
+        val isDefaultFallback = rawName.startsWith("image_") &&
+            rawName.substringAfter("image_").substringBeforeLast('.').all { it.isDigit() }
+
+        val name = if (isDefaultFallback) {
+            path.substringAfterLast('/')
+        } else {
+            rawName.substringBeforeLast('.')
+        }
+
+        if (PURE_NUMBER_REGEX.matches(name)) {
+            return name.padStart(20, '0')
+        }
+
+        val allMatches = UNDERSCORE_NUMBER_REGEX.findAll(name).toList()
+        if (allMatches.size >= 2) {
+            return allMatches.joinToString("") { it.groupValues[1].padStart(10, '0') }
+        }
+        if (allMatches.size == 1) {
+            return allMatches[0].groupValues[1].padStart(20, '0')
+        }
+
+        return name.lowercase()
+    }
+
+    fun sortedByName(context: Context, paths: List<String>): List<String> {
+        return paths.sortedBy { extractSortKey(context, it) }
+    }
 
     /**
      * Carga un bitmap desde una ruta (content:// o file://).
@@ -129,15 +161,16 @@ object ImageProcessor {
             maxWidth: Int = 1920,
             maxHeight: Int = 2560
     ) {
-        imagePaths.forEach { inputPath ->
+        val sortedPaths = sortedByName(context, imagePaths)
+        sortedPaths.forEachIndexed { index, inputPath ->
             try {
                 Log.d(TAG, "Optimizing: $inputPath")
 
-                val originalBitmap = loadBitmapFromPath(context, inputPath) ?: return@forEach
+                val originalBitmap = loadBitmapFromPath(context, inputPath) ?: return@forEachIndexed
 
                 if (originalBitmap.width <= 0 || originalBitmap.height <= 0) {
                     originalBitmap.recycle()
-                    return@forEach
+                    return@forEachIndexed
                 }
 
                 val scaledBitmap =
@@ -156,14 +189,17 @@ object ImageProcessor {
                             )
                         } else originalBitmap
 
-                val fileName = "opt_${UriHelper.getFileNameFromPath(context, inputPath)}"
+                val originalName = UriHelper.getFileNameFromPath(context, inputPath)
+                val ext = originalName.substringAfterLast('.', "jpg")
+                val safeIndex = index.toString().padStart(2, '0')
+                val fileName = "opt_${safeIndex}.$ext"
 
                 val (outputStream, outputPath) =
                         FileUtils.createOutputFile(context, outputDirPath, fileName, "image/jpeg")
                                 ?: run {
                                     originalBitmap.recycle()
                                     if (scaledBitmap != originalBitmap) scaledBitmap.recycle()
-                                    return@forEach
+                                    return@forEachIndexed
                                 }
 
                 try {
@@ -196,7 +232,8 @@ object ImageProcessor {
             targetFormat: String = "WEBP_LOSSY"
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            imagePaths.forEach { inputPath ->
+            val sortedPaths = sortedByName(context, imagePaths)
+            sortedPaths.forEachIndexed { index, inputPath ->
                 var bitmap: Bitmap? = null
                 var tempFile: File? = null
 
@@ -207,12 +244,12 @@ object ImageProcessor {
                             loadBitmapFromPathSafe(context, inputPath)
                                     ?: run {
                                         Log.e(TAG, "Failed to load: $inputPath")
-                                        return@forEach
+                                        return@forEachIndexed
                                     }
 
                     if (bitmap.width <= 0 || bitmap.height <= 0) {
                         Log.e(TAG, "Invalid bitmap: ${bitmap.width}x${bitmap.height}")
-                        return@forEach
+                        return@forEachIndexed
                     }
 
                     Log.d(TAG, "Bitmap loaded: ${bitmap.width}x${bitmap.height}")
@@ -286,10 +323,9 @@ object ImageProcessor {
                                         }
                             }
 
-                    val baseName =
-                            UriHelper.getFileNameFromPath(context, inputPath)
-                                    .substringBeforeLast('.')
-                    val fileName = "$baseName.$extension"
+                    val originalName = UriHelper.getFileNameFromPath(context, inputPath)
+                    val safeIndex = index.toString().padStart(2, '0')
+                    val fileName = "conv_${safeIndex}.$extension"
 
                     tempFile =
                             File(context.cacheDir, "temp_${System.currentTimeMillis()}_$extension")
@@ -307,7 +343,7 @@ object ImageProcessor {
                             FileUtils.createOutputFile(context, outputDirPath, fileName, mimeType)
                     if (result == null) {
                         Log.e(TAG, "No output: $fileName")
-                        return@forEach
+                        return@forEachIndexed
                     }
 
                     val (outputStream, outputPath) = result

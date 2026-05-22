@@ -29,7 +29,8 @@ object PdfWatermarkProcessor {
         fontSize: Float = 48f,
     ) {
         withContext(Dispatchers.IO) {
-            pdfPaths.forEach { inputPath ->
+            val sortedPaths = ImageProcessor.sortedByName(context, pdfPaths)
+            sortedPaths.forEach { inputPath ->
                 processSinglePdf(
                     context = context,
                     inputPath = inputPath,

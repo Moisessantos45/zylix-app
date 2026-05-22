@@ -20,6 +20,7 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
+| v1.9.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1XGdSXNJt89PFXazsnLUDZxglUj2RB8op/view?usp=sharing) | 2026-05-22 |
 | v1.9.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/10nuKuxbxuS1BiNVHR6OEKUiFb9s7O1Cf/view?usp=sharing) | 2026-05-09 |
 | v1.8.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1ur96ZLVEyBtFh060GHc1VttjQUXen5F9/view?usp=sharing) | 2026-04-05 |
 | v1.7.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1KhjXZY_3xOL0zP7wVk-tZlLe5FdSZICu/view?usp=sharing) | 2026-02-21 |
@@ -40,6 +41,18 @@
 4. ¡Listo! Ya puedes usar Zylix
 
 ## 📝 Historial de Cambios
+
+### v1.9.65+17 — 2026-05-22
+
+- **Ordenamiento Inteligente de Archivos (Procesamiento por Lotes)**: Se implementó un sistema de ordenamiento numérico/alfabético inteligente de archivos en todos los procesadores nativos de imágenes y PDFs para garantizar un flujo lógico y predecible en las operaciones por lotes:
+  - **Conversión & Compresión de Imágenes (`ImageProcessor`)**: Las imágenes se ordenan por nombre antes de ser optimizadas o convertidas, garantizando que los archivos de salida numerados secuencialmente (`opt_00.jpg`, `conv_00.webp`, etc.) sigan la secuencia lógica.
+  - **Imagen a PDF (`PdfProcessor.imgToPdf`)**: Las imágenes de entrada se ordenan por nombre antes de generar el PDF, asegurando que las páginas del documento resultante sigan el orden secuencial correcto.
+  - **Fusión de PDFs (`PdfProcessor.mergePdfs`)**: Los documentos PDF seleccionados se ordenan numéricamente antes de fusionarse, garantizando que se concatenen en la secuencia lógica correcta (ej: `doc_1.pdf` antes de `doc_2.pdf`).
+  - **Procesamiento de PDFs (`PdfProcessor.pdfsToImages`, `splitPdfs`, `optimizePdfs`)**: El procesamiento por lotes para convertir PDFs a imágenes, dividirlos u optimizarlos ahora se ejecuta de manera secuencial ordenada.
+  - **Rotación y Marcas de Agua (`PdfRotateProcessor`, `PdfWatermarkProcessor`)**: Rotaciones y aplicación de marcas de agua por lotes ahora procesan y guardan los archivos resultantes en orden.
+  - **Extracción de Texto (`PdfTextExtractorProcessor`)**: Los textos extraídos se generan secuencialmente de acuerdo al orden de los PDFs de origen.
+  - **Eliminación de Fondo con IA (`ImageBgRemoverProcessor`)**: Las imágenes ahora se ordenan de forma secuencial antes de removerles el fondo con ML Kit Selfie Segmentation.
+- **Optimización de Hilos y Rendimiento Asíncrono (`MainActivity.kt`)**: Se migraron y estructuraron los métodos del `MethodChannel` para que todo el procesamiento pesado (como la fusión de PDFs, compresión de imágenes y la eliminación de fondos mediante IA) se ejecute asíncronamente en hilos secundarios de fondo (`Dispatchers.IO` o mediante corutinas asíncronas). Esto previene por completo bloqueos en el hilo principal (*Main UI Thread*) de Android, garantizando que la interfaz gráfica de Flutter se mantenga fluida y libre de congelamientos o diálogos de "Application Not Responding" (ANR).
 
 ### v1.9.1+10 — 2026-05-09
 

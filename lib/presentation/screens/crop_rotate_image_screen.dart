@@ -90,6 +90,7 @@ class _CropRotateImageScreenState extends State<CropRotateImageScreen> {
     }
 
     _isProcessing.value = true;
+     await Future.delayed(Duration.zero);
     try {
       final fileName = 'cropped_${DateTime.now().millisecondsSinceEpoch}.jpg';
       await NativeBridge.copyUriToDirectory(

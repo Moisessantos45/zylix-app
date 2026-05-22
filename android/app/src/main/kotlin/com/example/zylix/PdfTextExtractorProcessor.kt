@@ -15,7 +15,8 @@ object PdfTextExtractorProcessor {
 
     suspend fun extractTextFromPdfs(context: Context, pdfPaths: List<String>, outputDirPath: String) {
         withContext(Dispatchers.IO) {
-            pdfPaths.forEach { pdfPath ->
+            val sortedPaths = ImageProcessor.sortedByName(context, pdfPaths)
+            sortedPaths.forEach { pdfPath ->
                  processPdfFile(context, pdfPath, outputDirPath)
             }
         }

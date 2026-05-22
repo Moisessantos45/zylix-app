@@ -3,12 +3,13 @@ package com.example.zylix
 import android.content.Context
 import android.net.Uri
 import android.os.ParcelFileDescriptor
+import android.provider.OpenableColumns
 import android.util.Log
 import java.io.File
 
-/** Utilidades para manejar URIs, conversiones y operaciones relacionadas con URIs. */
 object UriHelper {
     private const val TAG = "UriHelper"
+    private const val UNKNOWN_FILE = "unknown_file"
 
     /**
      * Obtiene los bytes de un URI dado.
@@ -20,151 +21,115 @@ object UriHelper {
         return try {
             uriString?.let {
                 val uri = Uri.parse(it)
-                context.contentResolver.openInputStream(uri)?.use { input -> input.readBytes() }
+                context.contentResolver.openInputStream(uri)?.use { input ->
+                    input.readBytes()
+                }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Error reading bytes from URI: $uriString", e)
             null
         }
     }
 
     /**
-     * Obtiene el nombre de archivo desde una ruta (puede ser content:// o file://).
+     * Obtiene el nombre de archivo desde una entrada que puede ser content://, file:// o path local.
      * @param context Contexto de la aplicación
-     * @param path Ruta del archivo
+     * @param path Ruta o URI en formato String
      * @return Nombre del archivo
      */
     fun getFileNameFromPath(context: Context, path: String): String {
-        return if (path.startsWith("content://")) {
-            val uri = Uri.parse(path)
-            var fileName = "image_${System.currentTimeMillis()}"
+        return try {
+            when {
+                path.startsWith("content://") -> {
+                    getFileNameFromUri(context, Uri.parse(path))
+                }
 
-            try {
-                context.contentResolver.query(
-                                uri,
-                                arrayOf(android.provider.OpenableColumns.DISPLAY_NAME),
-                                null,
-                                null,
-                                null
-                        )
-                        ?.use { cursor ->
-                            if (cursor.moveToFirst()) {
-                                val nameIndex =
-                                        cursor.getColumnIndex(
-                                                android.provider.OpenableColumns.DISPLAY_NAME
-                                        )
+                path.startsWith("file://") -> {
+                    File(path.removePrefix("file://")).name.ifBlank { UNKNOWN_FILE }
+                }
 
-                                if (nameIndex >= 0) {
-                                    fileName = cursor.getString(nameIndex)
-                                }
-                            }
-                        }
-            } catch (e: Exception) {
-                Log.w(TAG, "Could not get filename from URI, using default")
+                else -> {
+                    File(path).name.ifBlank { UNKNOWN_FILE }
+                }
             }
-
-            fileName
-        } else {
-            File(path).name
+        } catch (e: Exception) {
+            Log.w(TAG, "Error getting file name from path: $path", e)
+            UNKNOWN_FILE
         }
     }
 
     /**
      * Obtiene el nombre de un archivo PDF desde un URI.
+     * Si el nombre no termina en .pdf, se lo agrega.
      * @param context Contexto de la aplicación
      * @param uri URI del archivo PDF
      * @return Nombre del archivo con extensión .pdf
      */
     fun getPDFFileName(context: Context, uri: Uri): String {
-        context.contentResolver.query(
-                        uri,
-                        arrayOf(android.provider.OpenableColumns.DISPLAY_NAME),
-                        null,
-                        null,
-                        null
-                )
-                ?.use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        val nameIndex =
-                                cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-                        if (nameIndex >= 0) {
-                            val displayName = cursor.getString(nameIndex)
-                            if (!displayName.isNullOrEmpty()) {
-                                return if (displayName.endsWith(".pdf", ignoreCase = true)) {
-                                    displayName
-                                } else {
-                                    "$displayName.pdf"
-                                }
-                            }
-                        }
-                    }
-                }
-
-        val segments = uri.pathSegments
-        val lastSegment = segments.lastOrNull()
-
-        if (!lastSegment.isNullOrEmpty()) {
-            val baseName = lastSegment.substringBeforeLast('.')
-            return if (baseName.isNotEmpty()) {
-                "$baseName.pdf"
-            } else {
-                "document_$lastSegment.pdf"
-            }
+        val fileName = getFileNameFromUri(context, uri)
+        return if (fileName.endsWith(".pdf", ignoreCase = true)) {
+            fileName
+        } else {
+            "$fileName.pdf"
         }
-
-        return "document_${System.currentTimeMillis()}.pdf"
     }
 
     /**
      * Obtiene el nombre de archivo desde un URI genérico.
+     * Para content:// usa DISPLAY_NAME; si no existe, usa el último segmento del URI.
      * @param context Contexto de la aplicación
      * @param uri URI del archivo
      * @return Nombre del archivo
      */
     fun getFileNameFromUri(context: Context, uri: Uri): String {
-        var fileName = "unknown_pdf"
-
         try {
             context.contentResolver.query(
-                            uri,
-                            arrayOf(android.provider.OpenableColumns.DISPLAY_NAME),
-                            null,
-                            null,
-                            null
-                    )
-                    ?.use { cursor ->
-                        if (cursor.moveToFirst()) {
-                            val nameIndex =
-                                    cursor.getColumnIndex(
-                                            android.provider.OpenableColumns.DISPLAY_NAME
-                                    )
-
-                            if (nameIndex >= 0) {
-                                fileName = cursor.getString(nameIndex)
-                            }
-                        }
+                uri,
+                arrayOf(OpenableColumns.DISPLAY_NAME),
+                null,
+                null,
+                null
+            )?.use { cursor ->
+                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (cursor.moveToFirst() && nameIndex >= 0) {
+                    val displayName = cursor.getString(nameIndex)
+                    if (!displayName.isNullOrBlank()) {
+                        return displayName
                     }
+                }
+            }
         } catch (e: Exception) {
-            Log.w(TAG, "Could not get filename from URI, using default")
+            Log.w(TAG, "Could not get filename from URI: $uri", e)
         }
 
-        return fileName
+        return uri.lastPathSegment
+            ?.substringAfterLast('/')
+            ?.takeIf { it.isNotBlank() }
+            ?: UNKNOWN_FILE
     }
 
     /**
-     * Obtiene un ParcelFileDescriptor desde una ruta (content:// o file://).
+     * Obtiene un ParcelFileDescriptor desde una ruta (content://, file:// o path local).
      * @param context Contexto de la aplicación
-     * @param path Ruta del archivo
+     * @param path Ruta o URI en formato String
      * @return ParcelFileDescriptor o null si hay error
      */
     fun getFileDescriptorFromPath(context: Context, path: String): ParcelFileDescriptor? {
         return try {
-            if (path.startsWith("content://")) {
-                val uri = Uri.parse(path)
-                context.contentResolver.openFileDescriptor(uri, "r")
-            } else {
-                val file = File(path)
-                ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            when {
+                path.startsWith("content://") -> {
+                    context.contentResolver.openFileDescriptor(Uri.parse(path), "r")
+                }
+
+                path.startsWith("file://") -> {
+                    val file = File(path.removePrefix("file://"))
+                    ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+                }
+
+                else -> {
+                    val file = File(path)
+                    ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error opening file descriptor for: $path", e)

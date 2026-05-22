@@ -55,6 +55,7 @@ class _OptimizePdfScreenState extends State<OptimizePdfScreen> {
     }
 
     isProcessing.value = true;
+    await Future.delayed(Duration.zero);
 
     try {
       await NativeBridge.optimizePdf(

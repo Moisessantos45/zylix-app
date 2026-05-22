@@ -26,7 +26,8 @@ class _MergePdfScreenState extends State<MergePdfScreen>
     }
 
     isProcessing.value = true;
-
+    await Future.delayed(Duration.zero);
+  
     try {
       await NativeBridge.mergePdfs(
         selectedFilesPaths.value,

@@ -12,7 +12,6 @@ import com.tom_roush.pdfbox.multipdf.Splitter
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import java.io.File
 
-/** Procesador de PDFs para conversión, fusión y optimización. */
 object PdfProcessor {
     private const val TAG = "PdfProcessor"
 
@@ -28,7 +27,8 @@ object PdfProcessor {
         val pageWidth = 595
 
         try {
-            imagePaths.forEachIndexed { index, imagePath ->
+            val sortedPaths = ImageProcessor.sortedByName(context, imagePaths)
+            sortedPaths.forEachIndexed { index, imagePath ->
                 val bitmap =
                         ImageProcessor.loadBitmapFromPath(context, imagePath)
                                 ?: return@forEachIndexed
@@ -105,7 +105,8 @@ object PdfProcessor {
      * @param outputDirPath Directorio de salida para las imágenes
      */
     fun pdfsToImages(context: Context, pdfPaths: List<String>, outputDirPath: String) {
-        pdfPaths.forEach { pdfPath ->
+        val sortedPaths = ImageProcessor.sortedByName(context, pdfPaths)
+        sortedPaths.forEach { pdfPath ->
             var fileDescriptor: ParcelFileDescriptor? = null
             var pdfRenderer: PdfRenderer? = null
 
@@ -268,7 +269,8 @@ object PdfProcessor {
                         ?: throw Exception("Could not create output file")
 
         try {
-            pdfPaths.forEach { pdfPath ->
+            val sortedPaths = ImageProcessor.sortedByName(context, pdfPaths)
+            sortedPaths.forEach { pdfPath ->
                 val inputStream =
                         if (pdfPath.startsWith("content://")) {
                             context.contentResolver.openInputStream(Uri.parse(pdfPath))
@@ -328,7 +330,8 @@ object PdfProcessor {
             outputDirPath: String,
             quality: Int = 75
     ) {
-        pdfPaths.forEach { inputPath ->
+        val sortedPaths = ImageProcessor.sortedByName(context, pdfPaths)
+        sortedPaths.forEach { inputPath ->
             var inputStream: java.io.InputStream? = null
 
             try {
@@ -404,7 +407,8 @@ object PdfProcessor {
             endPage: Int = -1,
             splitAt: Int = 1
     ) {
-        pdfPaths.forEach { inputPath ->
+        val sortedPaths = ImageProcessor.sortedByName(context, pdfPaths)
+        sortedPaths.forEach { inputPath ->
             var inputStream: java.io.InputStream? = null
 
             try {

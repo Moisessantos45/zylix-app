@@ -28,6 +28,7 @@ class _PdfToImageScreenState extends State<PdfToImageScreen>
     }
 
     isProcessing.value = true;
+    await Future.delayed(Duration.zero);
 
     try {
       await NativeBridge.pdfToImg(

@@ -22,7 +22,8 @@ object PdfRotateProcessor {
         pageRange: String? = null,
     ) {
         withContext(Dispatchers.IO) {
-            pdfPaths.forEach { inputPath ->
+            val sortedPaths = ImageProcessor.sortedByName(context, pdfPaths)
+            sortedPaths.forEach { inputPath ->
                 processSinglePdf(context, inputPath, outputDirPath, angleDegrees, pageRange)
             }
         }
