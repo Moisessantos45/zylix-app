@@ -153,6 +153,49 @@ object ImageProcessor {
      * @param maxWidth Ancho máximo
      * @param maxHeight Alto máximo
      */
+    private fun getStartingIndex(context: Context, outputDirPath: String, prefix: String): Int {
+        return try {
+            if (outputDirPath.startsWith("content://")) {
+                val uri = Uri.parse(outputDirPath)
+                val docFile = androidx.documentfile.provider.DocumentFile.fromTreeUri(context, uri)
+                    ?: return 0
+
+                val existingFiles = docFile.listFiles().filter { file ->
+                    file.isFile && file.name?.startsWith(prefix) == true &&
+                    file.name?.substringAfter(prefix)?.contains(".") == true
+                }
+
+                if (existingFiles.isEmpty()) return 0
+
+                val maxIndex = existingFiles.mapNotNull { file ->
+                    val name = file.name?.removePrefix(prefix)?.substringBeforeLast('.')
+                    name?.toIntOrNull()
+                }.maxOrNull()
+
+                (maxIndex ?: -1) + 1
+            } else {
+                val dir = File(outputDirPath)
+                if (!dir.exists() || !dir.isDirectory) return 0
+
+                val existingFiles = dir.listFiles { file ->
+                    file.name.startsWith(prefix) && file.name.substringAfter(prefix).contains(".")
+                } ?: return 0
+
+                if (existingFiles.isEmpty()) return 0
+
+                val maxIndex = existingFiles.mapNotNull { file ->
+                    val name = file.name.removePrefix(prefix).substringBeforeLast('.')
+                    name.toIntOrNull()
+                }.maxOrNull()
+
+                (maxIndex ?: -1) + 1
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting starting index: $outputDirPath", e)
+            0
+        }
+    }
+
     fun optimizeImages(
             context: Context,
             imagePaths: List<String>,
@@ -162,6 +205,7 @@ object ImageProcessor {
             maxHeight: Int = 2560
     ) {
         val sortedPaths = sortedByName(context, imagePaths)
+        val startIndex = getStartingIndex(context, outputDirPath, "opt_")
         sortedPaths.forEachIndexed { index, inputPath ->
             try {
                 Log.d(TAG, "Optimizing: $inputPath")
@@ -191,7 +235,7 @@ object ImageProcessor {
 
                 val originalName = UriHelper.getFileNameFromPath(context, inputPath)
                 val ext = originalName.substringAfterLast('.', "jpg")
-                val safeIndex = index.toString().padStart(2, '0')
+                val safeIndex = (startIndex + index).toString().padStart(3, '0')
                 val fileName = "opt_${safeIndex}.$ext"
 
                 val (outputStream, outputPath) =
@@ -233,6 +277,7 @@ object ImageProcessor {
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             val sortedPaths = sortedByName(context, imagePaths)
+            val startIndex = getStartingIndex(context, outputDirPath, "conv_")
             sortedPaths.forEachIndexed { index, inputPath ->
                 var bitmap: Bitmap? = null
                 var tempFile: File? = null
@@ -324,7 +369,7 @@ object ImageProcessor {
                             }
 
                     val originalName = UriHelper.getFileNameFromPath(context, inputPath)
-                    val safeIndex = index.toString().padStart(2, '0')
+                    val safeIndex = (startIndex + index).toString().padStart(3, '0')
                     val fileName = "conv_${safeIndex}.$extension"
 
                     tempFile =

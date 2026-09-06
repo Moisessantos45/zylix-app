@@ -24,8 +24,8 @@ class _OptimizePdfScreenState extends State<OptimizePdfScreen> {
     if (files.isEmpty) return;
     final filesNames = await NativeBridge.getFileNamesBatch(files);
 
-    selectedFilesPaths.value.addAll(files);
-    thumbnails.value.addAll(filesNames);
+    selectedFilesPaths.value = List<String>.from(selectedFilesPaths.value)..addAll(files);
+    thumbnails.value = List<String>.from(thumbnails.value)..addAll(filesNames);
   }
 
   void removeFiles(int index) {
