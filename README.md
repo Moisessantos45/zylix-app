@@ -20,7 +20,8 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
-| **v2.1.0** | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
+| **v2.1.1** | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
+| v2.1.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
 | v2.0.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1b91XkW2gnAImwML75av7pqYsKwYLDg7U/view?usp=sharing) | 2026-09-06 |
 | v1.9.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1XGdSXNJt89PFXazsnLUDZxglUj2RB8op/view?usp=sharing) | 2026-05-22 |
 | v1.9.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/10nuKuxbxuS1BiNVHR6OEKUiFb9s7O1Cf/view?usp=sharing) | 2026-05-09 |
@@ -43,6 +44,10 @@
 4. ¡Listo! Ya puedes usar Zylix
 
 ## 📝 Historial de Cambios
+
+### v2.1.1+22 — 2026-09-06
+
+- **Verificación de versión mejorada** (`about.dart`): Se simplificó la lógica para obtener la versión remota usando el campo `lastVersion` que devuelve la API directamente (`"2.1.1"`), en lugar de parsearlo del nombre del archivo. Se mantiene `extractVersionFromName(file.name)` como fallback si `lastVersion` llega vacío.
 
 ### v2.1.0+21 — 2026-09-06
 
@@ -94,7 +99,15 @@
 - **💧 Watermark PDF**: Añade texto diagonal semitransparente (marca de agua) a todas las páginas de uno o varios PDFs. El usuario puede personalizar el texto y la opacidad (10%–90%). Procesado nativamente con iTextG.
 - **🔄 Rotate PDF**: Rota páginas de PDFs a 90° ↻, 180° o 90° ↺. Permite aplicar la rotación a todas las páginas o solo a un rango específico (ej: `1,3-5`). Procesado con iTextG sin pérdida de calidad.
 - **✂️ Crop & Rotate Image**: Recorta y rota imágenes con precisión usando la librería UCrop (integrada vía `image_cropper`). Soporta múltiples proporciones y rotación libre. El resultado se guarda en la carpeta elegida.
-- **📝 Extraer Texto de PDF**: Extrae el texto raw de PDFs digitales procesados en hilos separados. Guarda el resultado como archivo `.txt`. Usa iTextG internamente.
+- **📝 Extraer Texto de PDF{
+  "data": {
+    "id": "1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ",
+    "name": "zylix-2.1.0.apk",
+    "mimeType": "application/vnd.android.package-archive",
+    "size": "87191389",
+    "lastVersion": "2.1.0"
+  }
+}**: Extrae el texto raw de PDFs digitales procesados en hilos separados. Guarda el resultado como archivo `.txt`. Usa iTextG internamente.
 - **🧹 Quitar Fondo (Remove Background)**: Elimina el fondo de fotos de personas o selfies usando ML Kit Selfie Segmentation. Exporta como PNG con canal alfa transparente.
 
 ### v1.7.0+7

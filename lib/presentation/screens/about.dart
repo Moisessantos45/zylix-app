@@ -110,7 +110,9 @@ class _AboutScreenState extends State<AboutScreen> {
         final fileData = response.data['data'];
         final file = FileResponse.fromJson(fileData);
 
-        final remoteVersion = extractVersionFromName(file.name);
+        final remoteVersion = file.lastVersion.isNotEmpty
+            ? file.lastVersion
+            : extractVersionFromName(file.name);
 
         debugPrint(
           "Versión remota: $remoteVersion | Versión actual: $currentVersion",
