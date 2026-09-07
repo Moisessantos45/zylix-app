@@ -96,8 +96,10 @@ class _AboutScreenState extends State<AboutScreen> {
   }
 
   Future<void> checkVersion(String currentVersion) async {
+    if (downloading.value) return;
     downloading.value = true;
 
+    bool willDownload = false;
     try {
       final dio = Dio();
 
@@ -123,6 +125,7 @@ class _AboutScreenState extends State<AboutScreen> {
           showGlobalSnackBar(
             "Nueva versión disponible ($remoteVersion). Descargando...",
           );
+          willDownload = true;
           await downloadAPK(fileId: file.id, fileName: file.name);
         } else {
           showGlobalSnackBar("Ya tienes la última versión");
@@ -145,7 +148,7 @@ class _AboutScreenState extends State<AboutScreen> {
       debugPrint('Error al verificar la versión: $e');
       showGlobalSnackBar("Error al verificar actualizaciones", isError: true);
     } finally {
-      if (mounted) {
+      if (mounted && !willDownload) {
         downloading.value = false;
       }
     }
@@ -162,7 +165,11 @@ class _AboutScreenState extends State<AboutScreen> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([versionCode, downloading]),
+      listenable: Listenable.merge([
+        versionCode,
+        downloading,
+        downloadProgress,
+      ]),
       builder: (context, child) {
         return Scaffold(
           key: scaffoldKey,

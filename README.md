@@ -20,7 +20,8 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
-| **v2.1.1** | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
+| **v2.1.2** | Android | [⬇️ Descargar](https://drive.google.com/file/d/13DVvWKXmTCnlmi_Rn9r9n1o9q9ePTUP2/view?usp=sharing) | 2026-09-06 |
+| v2.1.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
 | v2.1.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
 | v2.0.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1b91XkW2gnAImwML75av7pqYsKwYLDg7U/view?usp=sharing) | 2026-09-06 |
 | v1.9.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1XGdSXNJt89PFXazsnLUDZxglUj2RB8op/view?usp=sharing) | 2026-05-22 |
@@ -44,6 +45,13 @@
 4. ¡Listo! Ya puedes usar Zylix
 
 ## 📝 Historial de Cambios
+
+### v2.1.2+23 — 2026-09-06
+
+- **Fix: botón de descarga bloqueado durante la descarga** (`about.dart`): Se corrigieron tres problemas que impedían que el botón mostrara el estado de progreso:
+  - Se agregó guard `if (downloading.value) return` al inicio de `checkVersion()` para evitar doble tap.
+  - Se introdujo la bandera `willDownload` para que el `finally` de `checkVersion` solo libere el botón si no se inició descarga; en ese caso `downloadAPK()` lo libera en su propio `finally`.
+  - Se añadió `downloadProgress` al `Listenable.merge` del `ListenableBuilder`, permitiendo que el texto `"Descargando... X%"` se actualice en tiempo real.
 
 ### v2.1.1+22 — 2026-09-06
 
