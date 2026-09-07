@@ -20,6 +20,8 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
+| **v2.1.0** | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
+| v2.0.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1b91XkW2gnAImwML75av7pqYsKwYLDg7U/view?usp=sharing) | 2026-09-06 |
 | v1.9.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1XGdSXNJt89PFXazsnLUDZxglUj2RB8op/view?usp=sharing) | 2026-05-22 |
 | v1.9.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/10nuKuxbxuS1BiNVHR6OEKUiFb9s7O1Cf/view?usp=sharing) | 2026-05-09 |
 | v1.8.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1ur96ZLVEyBtFh060GHc1VttjQUXen5F9/view?usp=sharing) | 2026-04-05 |
@@ -41,6 +43,30 @@
 4. ¡Listo! Ya puedes usar Zylix
 
 ## 📝 Historial de Cambios
+
+### v2.1.0+21 — 2026-09-06
+
+- **Actualización del README**: Se actualizó la documentación del proyecto (`README.md`) para reflejar todos los cambios introducidos en las versiones `2.0.0` y anteriores, incluyendo la tabla de descargas, el historial de cambios y la descripción de nuevas funcionalidades.
+- **Ajuste de versión**: Se incrementó la versión de `2.0.0+20` a `2.1.0+21` en `pubspec.yaml`.
+
+### v2.0.0+20 — 2026-09-06
+
+- **Actualización de versión a 2.0.0**: Se actualizó la versión de la aplicación a `2.0.0+20` en `pubspec.yaml`, marcando una nueva versión mayor con mejoras significativas en rendimiento y arquitectura.
+- **Migración a Java 17**: Se actualizó la versión de Java del proyecto Android a la versión 17 (LTS), mejorando la compatibilidad y el rendimiento de compilación.
+- **Optimización de propiedades Gradle**: Se ajustaron las propiedades de Gradle para un mejor rendimiento de compilación:
+  - Reducción del heap de JVM a `3072M` para evitar consumo excesivo de memoria.
+  - Habilitación de compilación paralela (`org.gradle.parallel=true`), caché de Gradle (`org.gradle.caching=true`) y el daemon (`org.gradle.daemon=true`).
+  - Activación de `org.gradle.vfs.watch=true` para mayor velocidad en builds incrementales.
+  - Habilitación de `android.enableR8.fullMode=true` y `android.nonTransitiveRClass=true` para mayor optimización del APK.
+- **Sistema de verificación de versiones**: Se implementó un sistema inteligente de comparación de versiones (`compare_version.dart`) que detecta automáticamente si existe una versión más reciente disponible, usando comparación semántica (`MAJOR.MINOR.PATCH`).
+- **Lógica de descarga e instalación de APK mejorada** (`about.dart`):
+  - La descarga ahora se realiza vía `GET` al endpoint `/download/{fileId}` con soporte de `ResponseType.stream` para mayor estabilidad.
+  - Se creó el modelo `FileResponse` (`domain/file.dart`) para representar la respuesta del servidor con metadatos del archivo (id, nombre, mimeType, tamaño, `lastVersion`).
+  - Se refactorizó `downloadAPK()` para recibir `fileId` y `fileName` como parámetros explícitos.
+  - Se añadió manejo de errores mejorado con `showGlobalSnackBar` en caso de fallos durante la descarga.
+  - El progreso de descarga se inicializa en `0.0` antes de iniciar cada descarga.
+- **Actualización de variable de entorno**: La variable de entorno del API cambió de `API_URL` a `API_URL_V3` en `config.dart`.
+- **Logo nativo optimizado**: Se reemplazó el logo PNG del splash screen (`mi_logo.png`) por su versión JPG de menor tamaño en `drawable/` y `drawable-v21/`, reduciendo el tamaño del APK.
 
 ### v1.9.65+17 — 2026-05-22
 
