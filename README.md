@@ -20,7 +20,8 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
-| **v2.1.2** | Android | [⬇️ Descargar](https://drive.google.com/file/d/13DVvWKXmTCnlmi_Rn9r9n1o9q9ePTUP2/view?usp=sharing) | 2026-09-06 |
+| **v2.1.3** | Android | [⬇️ Descargar](https://drive.google.com/file/d/1iR1GB1r59gKojbS5AWV7ovytL_rRANj4/view?usp=sharing) | 2026-09-08 |
+| v2.1.2 | Android | [⬇️ Descargar](https://drive.google.com/file/d/13DVvWKXmTCnlmi_Rn9r9n1o9q9ePTUP2/view?usp=sharing) | 2026-09-06 |
 | v2.1.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
 | v2.1.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
 | v2.0.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1b91XkW2gnAImwML75av7pqYsKwYLDg7U/view?usp=sharing) | 2026-09-06 |
@@ -45,6 +46,15 @@
 4. ¡Listo! Ya puedes usar Zylix
 
 ## 📝 Historial de Cambios
+
+### v2.1.3+24 — 2026-09-08
+
+- **Reducción de tamaño del APK (-8.3 MB)**: Se optimizó el empaquetado (`packaging.resources.excludes`) en Gradle excluyendo tablas criptográficas innecesarias de BouncyCastle (`org/bouncycastle/pqc/**`) y licencias redundantes, pasando el APK de 91.3 MB a 83.0 MB.
+- **Actualización de Gradle Wrapper a 8.14 (bin)**: Se actualizó la distribución a `gradle-8.14-bin.zip`, ahorrando más de 130 MB en descargas de Gradle y resolviendo avisos de versiones obsoletas en Flutter.
+- **Compatibilidad con Java 17 (LTS)**: Se configuraron `sourceCompatibility`, `targetCompatibility` y `jvmTarget` a `JavaVersion.VERSION_17`, eliminando warnings de compatibilidad con Java 8/11.
+- **Limpieza de dependencias y ProGuard**: Se removió la librería obsoleta `play:core` y se actualizaron las directivas en `proguard-rules.pro` con `-dontwarn` para optimizaciones limpias y seguras con R8.
+- **Optimización de red con Dio**: Se implementó una instancia estática y reutilizable de `Dio` con timeouts de conexión y recepción de 15 segundos para evitar consumos de batería y conexiones colgadas.
+- **Optimizaciones avanzadas de Gradle**: Configuración de `org.gradle.parallel=true`, `org.gradle.caching=true`, `org.gradle.daemon=true`, `org.gradle.vfs.watch=true`, `android.nonTransitiveRClass=true` y `android.enableR8.fullMode=true`.
 
 ### v2.1.2+23 — 2026-09-06
 

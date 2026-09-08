@@ -23,19 +23,10 @@
 -keep class com.google.firebase.** { *; }
 -keep class androidx.lifecycle.DefaultLifecycleObserver
 
-# ✅ NUEVAS REGLAS PARA PLAY CORE (Solucionan tu error actual)
--keep class com.google.android.play.core.** { *; }
--keep class com.google.android.play.tasks.** { *; }
--keep class com.google.android.play.splitinstall.** { *; }
--keep class com.google.android.play.splitcompat.** { *; }
-
-# Reglas específicas para las clases mencionadas en el error
--keep class com.google.android.play.core.splitcompat.SplitCompatApplication { *; }
--keep class com.google.android.play.core.splitinstall.** { *; }
--keep class com.google.android.play.core.tasks.** { *; }
-
-# Mantener todas las clases de Play Core referenciadas
--keep class com.google.android.play.** { *; }
+# Play Core (Ignorar advertencias de componentes diferidos no usados en Flutter)
+-dontwarn com.google.android.play.core.**
+-dontwarn com.google.android.play.tasks.**
+-dontwarn com.google.android.play.**
 
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.

@@ -6,6 +6,14 @@ import 'package:flutter/foundation.dart';
 import 'package:zylix/presentation/utils/compare_version.dart';
 
 class Api {
+  static final Dio _dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
+      sendTimeout: const Duration(seconds: 15),
+    ),
+  );
+
   static Future<void> initializeVersion() async {
     debugPrint("Obteniendo versión de la aplicación... ${Config.API_URL}");
     if (Config.API_URL.isEmpty) {
@@ -23,9 +31,7 @@ class Api {
 
   static Future<void> checkVersion(String currentVersion) async {
     try {
-      final dio = Dio();
-
-      final response = await dio.get(
+      final response = await _dio.get(
         '${Config.API_URL}/version/zylix',
         queryParameters: {'platforms': 'android'},
       );

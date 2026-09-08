@@ -10,7 +10,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("com.google.android.material:material:1.12.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation("com.google.android.play:core:1.10.3")
     implementation("com.jakewharton:process-phoenix:3.0.0")
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
@@ -80,6 +79,16 @@ android {
         getByName("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
+        }
+    }
+
+    packaging {
+        resources {
+            excludes += "org/bouncycastle/pqc/**"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE*"
+            excludes += "META-INF/NOTICE*"
+            excludes += "META-INF/*.kotlin_module"
         }
     }
 }
