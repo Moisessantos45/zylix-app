@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:zylix/config/api.dart';
 import 'package:zylix/presentation/screens/welcome.dart';
+import 'package:zylix/presentation/utils/apk_cleaner.dart';
 
 final GlobalKey<ScaffoldMessengerState> messageKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -17,6 +18,7 @@ void main() async {
   ]);
 
   Api.initializeVersion();
+  ApkCleaner.cleanOldApks();
 
   runApp(const MyApp());
 }

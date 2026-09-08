@@ -20,7 +20,8 @@
 
 | Versión | Plataforma | Descarga | Fecha |
 |---------|-----------|----------|-------|
-| **v2.1.3** | Android | [⬇️ Descargar](https://drive.google.com/file/d/1iR1GB1r59gKojbS5AWV7ovytL_rRANj4/view?usp=sharing) | 2026-09-08 |
+| **v2.1.4** | Android | [⬇️ Descargar](https://drive.google.com/file/d/1am24XR1nCXwiJJQlswghdmdtc7ahgygU/view?usp=sharing) | 2026-09-08 |
+| v2.1.3 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1iR1GB1r59gKojbS5AWV7ovytL_rRANj4/view?usp=sharing) | 2026-09-08 |
 | v2.1.2 | Android | [⬇️ Descargar](https://drive.google.com/file/d/13DVvWKXmTCnlmi_Rn9r9n1o9q9ePTUP2/view?usp=sharing) | 2026-09-06 |
 | v2.1.1 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
 | v2.1.0 | Android | [⬇️ Descargar](https://drive.google.com/file/d/1JFA7ebPUTpWaeXLCv5L5ug_DjS4DNbDJ/view?usp=sharing) | 2026-09-06 |
@@ -46,6 +47,10 @@
 4. ¡Listo! Ya puedes usar Zylix
 
 ## 📝 Historial de Cambios
+
+### v2.1.4+25 — 2026-09-08
+
+- **Limpieza automática de APKs residuales en segundo plano (`apk_cleaner.dart`)**: Se implementó una tarea asíncrona que se ejecuta al iniciar la aplicación (`main.dart`) para detectar y eliminar automáticamente cualquier instalador `.apk` de versiones anteriores almacenado en el dispositivo tras una actualización, liberando más de 80 MB de almacenamiento sin bloquear el renderizado ni la fluidez de la interfaz de usuario.
 
 ### v2.1.3+24 — 2026-09-08
 
